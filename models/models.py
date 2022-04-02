@@ -1,1 +1,2 @@
-from models.basic_user import *
+from models.bsuser import *
+from models.bsadmin import *
