@@ -6,7 +6,7 @@ from models.models import *
 def get_profile(request):
     # 检测是否登录过期
     if session_expired(request, 'openid'):
-        return msg_response(ret=2, msg="登录过期")
+        return msg_response(ret=2)
 
     openid = request.session['openid']
 
@@ -25,12 +25,12 @@ def get_profile(request):
 def modify_profile(request):
     # 检测是否登录过期
     if session_expired(request, 'openid'):
-        return msg_response(ret=2, msg="登录过期")
+        return msg_response(2)
 
     openid = request.session['openid']
 
     if 'newdata' not in request.params:
-        return msg_response(3, msg='参数错误')
+        return msg_response(3)
 
     newdata = request.params['newdata']
     try:

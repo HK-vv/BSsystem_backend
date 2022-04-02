@@ -12,22 +12,21 @@ from utils.auxilary import *
 def login(request):
     code = json.loads(request.body)
     if "code" not in code:
-        return JsonResponse({'ret': 3, 'msg': '参数有误'})
+        return msg_response(3)
 
     code = code['code']
-    # print(code)
 
-    # response = requests.get(f'https://api.weixin.qq.com/sns/jscode2session?appid={APPID}&secret={SECRET}&js_code={code}'
-    #                         '&grant_type=authorization_code')
-    #
-    # info = response.json()
-    # # print(info)
-    # if 'errcode' in info:
-    #     return JsonResponse({'ret': info['errcode'], 'msg': info['errmsg']})
-    #
-    # openid = info['openid']
-    # session_key = info['session_key']
-    openid = code
+    response = requests.get(f'https://api.weixin.qq.com/sns/jscode2session?appid={APPID}&secret={SECRET}&js_code={code}'
+                            '&grant_type=authorization_code')
+
+    info = response.json()
+
+    if 'errcode' in info:
+        return JsonResponse({'ret': info['errcode'], 'msg': info['errmsg']})
+
+    openid = info['openid']
+    session_key = info['session_key']
+    # openid = code
     user = BSUser.objects.filter(openid=openid)
     # 不存在用户，注册
     if not user:
@@ -45,7 +44,7 @@ def login(request):
 
     # 设置session
     request.session['openid'] = openid
-    # request.session['session_key'] = session_key
+    request.session['session_key'] = session_key
 
     return JsonResponse({'ret': 0,
                          'username': username})
@@ -54,10 +53,10 @@ def login(request):
 def logout(request):
     # 使用登出方法
     if session_expired(request, 'openid'):
-        return msg_response(ret=2, msg="登录过期")
+        return msg_response(2)
     openid = request.session['openid']
     username = BSUser.objects.get(openid=openid).username
     print(username + " 用户已登出")
     del request.session['openid']
-    # del request.session['session_key']
+    del request.session['session_key']
     return JsonResponse({'ret': 0})
