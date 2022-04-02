@@ -41,11 +41,13 @@ class Test(TestCase):
                                  json=payload)
         pprint.pprint(response.json())
 
+    def test_get_problem(self, id):
+        response = requests.get(f'http://{self.localhost}:{self.port}/api/user/exercise/problem?id={id}', cookies=self.cookie)
+        pprint.pprint(response.json())
+
 
 if __name__ == '__main__':
     t = Test()
     t.test_login()
-    t.test_get_info()
-    t.test_modify_info('eddie')
-    t.test_get_info()
+    t.test_get_problem(3)
     t.test_logout()
