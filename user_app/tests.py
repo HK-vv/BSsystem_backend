@@ -20,15 +20,32 @@ class Test(TestCase):
         response = requests.post(f'http://{self.localhost}:{self.port}/api/user/login',
                                  json=payload)
         pprint.pprint(response.json())
-        pprint.pprint(response.cookies.values())
+        # pprint.pprint(response.cookies.values())
         self.cookie = response.cookies
 
     def test_logout(self):
         response = requests.post(f'http://{self.localhost}:{self.port}/api/user/logout', cookies=self.cookie)
         pprint.pprint(response.json())
 
+    def test_get_info(self):
+        response = requests.get(f'http://{self.localhost}:{self.port}/api/user/profile', cookies=self.cookie)
+        pprint.pprint(response.json())
+
+    def test_modify_info(self, username):
+        payload = {
+            "newdata": {
+                "username": username
+            }
+        }
+        response = requests.post(f'http://{self.localhost}:{self.port}/api/user/profile', cookies=self.cookie,
+                                 json=payload)
+        pprint.pprint(response.json())
+
 
 if __name__ == '__main__':
     t = Test()
     t.test_login()
+    t.test_get_info()
+    t.test_modify_info('eddie')
+    t.test_get_info()
     t.test_logout()
