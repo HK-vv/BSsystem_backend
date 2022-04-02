@@ -20,7 +20,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 with open('./secret.json') as f:
-    SECRET_KEY = json.load(f)['api_key']
+    secret = json.load(f)
+    SECRET_KEY = secret['api_key']
+    APPID = secret['APPID']
+    SECRET = secret['SECRET']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
