@@ -4,6 +4,22 @@ from functools import wraps
 from utils.auxilary import msg_response
 
 
+def require_nothing():
+    def decorator(func):
+        @wraps(func)
+        def inner(request, *args, **kwargs):
+            try:
+                return func(request, *args, **kwargs)
+            except Exception as e:
+                traceback.print_exc()
+                print(e.args)
+                return msg_response(3)
+
+        return inner
+
+    return decorator
+
+
 def require_admin_login():
     def decorator(func):
         @wraps(func)

@@ -1,13 +1,13 @@
 import json
 
 from django.contrib.auth import login, authenticate, logout
-from django.views.decorators.http import require_http_methods
 
 from models.bsadmin import BSAdmin
 from utils.auxilary import msg_response
-from utils.decorators import require_admin_login
+from utils.decorators import *
 
 
+@require_nothing()
 def log_in(request):
     data = json.loads(request.body)
     usn = data['username']
