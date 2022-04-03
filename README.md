@@ -11,14 +11,19 @@
 #### 指令运行
 
 ```cmd
+# 下载后端文件
 git clone git@github.com:HK-vv/BSsystem_backend.git
 cd BSsystem_backend 
 
+# 安装必要包
 pip install django
 pip install requests
 
+# 建立本地数据库
 python manage.py makemigrations models
 python manage.py migrate
+
+# 运行后端
 python manage.py runserver 0.0.0.0:8080
 ```
 
