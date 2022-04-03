@@ -1,3 +1,4 @@
+import traceback
 from functools import wraps
 
 from utils.auxilary import msg_response
@@ -9,7 +10,12 @@ def require_admin_login():
         def inner(request, *args, **kwargs):
             if not request.user.is_authenticated():
                 return msg_response(2)
-            return func(request, *args, **kwargs)
+            try:
+                return func(request, *args, **kwargs)
+            except Exception as e:
+                traceback.print_exc()
+                print(e.args)
+                return msg_response(3)
 
         return inner
 
@@ -24,7 +30,12 @@ def require_super_login():
                 return msg_response(2)
             if not request.user.is_superuser():
                 return msg_response(1, "权限不足")
-            return func(request, *args, **kwargs)
+            try:
+                return func(request, *args, **kwargs)
+            except Exception as e:
+                traceback.print_exc()
+                print(e.args)
+                return msg_response(3)
 
         return inner
 

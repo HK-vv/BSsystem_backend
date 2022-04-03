@@ -10,8 +10,8 @@ from utils.decorators import require_admin_login
 
 def log_in(request):
     data = json.loads(request.body)
-    usn = data.get('username')
-    pwd = data.get('password')
+    usn = data['username']
+    pwd = data['password']
     print(usn, "is logging in")
     user = authenticate(username=usn, password=pwd)
     if user is None:
