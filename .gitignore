@@ -146,3 +146,6 @@ secret.json
 
 # Django
 migrations/
+
+# MacOS
+*.textClipping
