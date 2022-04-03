@@ -81,60 +81,6 @@ def get_problem(request):
         return msg_response(1, msg='题目不存在')
 
 
-# 选择题
-def choice_check(answer, ur_answer):
-    # 删除空格、分隔答案
-    # ans = answer.replace(" ", "").split(',')
-    # ur_ans = ur_answer.replace(" ", "").split(',')
-    ans = list(answer.replace(" ", ""))
-    ur_ans = list(ur_answer.replace(" ", ""))
-
-    # 删除空白项
-    while '' in ans:
-        ans.remove('')
-    while '' in ur_ans:
-        ur_ans.remove('')
-
-    # 长度不同则错
-    if len(ans) != len(ur_ans):
-        return 0
-    for choice in ans:
-        # 答案不在答题者答案中则错
-        if choice not in ur_ans:
-            return 0
-    return 1
-
-
-def completion_check(answer, ur_answer):
-    # 删除空格、分隔答案
-    ans_temp = answer.replace(" ", "").split(',')
-    ur_ans = ur_answer.replace(" ", "").split(',')
-
-    # 删除空白项
-    while '' in ans_temp:
-        ans_temp.remove('')
-    while '' in ur_ans:
-        ur_ans.remove('')
-
-    ans = []
-    for word in ans_temp:
-        ans.append(word.split('/'))
-
-    # 长度不同则错
-    if len(ans) != len(ur_ans):
-        return 0
-
-    length = len(ans)
-    for i in range(0, length):
-        ur_word = ur_ans[i]
-        ans_word = ans[i]
-        # 答案不在答题者答案中则错
-        if ur_word not in ans_word:
-            print(ur_word, ans_word)
-            return 0
-    return 1
-
-
 def check(request):
     # 检测是否登录过期
     if session_expired(request, 'openid'):
@@ -149,18 +95,12 @@ def check(request):
 
     try:
         problem = Problem.objects.get(id=problem_id)
-        answer = problem.answer
-        type = problem.type
+        if not problem.public:
+            msg_response(1, msg='题目未公开')
 
-        # 单选、多选、判断
-        if type in ['single', 'multiple', 'binary']:
-            correct = choice_check(answer, ur_answer)
-        # 填空
-        else:
-            correct = completion_check(answer, ur_answer)
         return JsonResponse({'ret': 0,
-                             'correct': correct,
-                             'answer': answer})
+                             'correct': iscorrect(problem_id, ur_answer),
+                             'answer': problem.answer})
 
     except Problem.DoesNotExist:
         return msg_response(1, msg='题目不存在')
