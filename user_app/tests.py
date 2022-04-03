@@ -45,9 +45,14 @@ class Test(TestCase):
         response = requests.get(f'http://{self.localhost}:{self.port}/api/user/exercise/problem?id={id}', cookies=self.cookie)
         pprint.pprint(response.json())
 
+    def test_collect(self, tag, amount):
+        response = requests.get(f'http://{self.localhost}:{self.port}/api/user/exercise/collect?tag={tag}&amount={amount}',
+                                cookies=self.cookie)
+        pprint.pprint(response.json())
+
 
 if __name__ == '__main__':
     t = Test()
     t.test_login()
-    t.test_get_problem(3)
+    t.test_collect('语文文', 4)
     t.test_logout()
