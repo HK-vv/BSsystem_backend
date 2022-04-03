@@ -1,9 +1,11 @@
 import json
 
 from django.contrib.auth import login, authenticate, logout
+from django.views.decorators.http import require_http_methods
 
 from models.bsadmin import BSAdmin
 from utils.auxilary import msg_response
+from utils.decorators import require_admin_login
 
 
 def log_in(request):
@@ -18,6 +20,7 @@ def log_in(request):
     return msg_response(0)
 
 
+@require_admin_login()
 def log_out(request):
     if request.user.is_authenticated:
         logout(request)
