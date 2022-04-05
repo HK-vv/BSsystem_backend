@@ -1,5 +1,7 @@
 from django.db import models
 from models.bsadmin import BSAdmin
+from models.problemtag import ProblemTag
+from models.tag import Tag
 
 
 class Problem(models.Model):
@@ -14,3 +16,4 @@ class Problem(models.Model):
     answer = models.CharField(max_length=100)
     public = models.BooleanField()
     authorid = models.ForeignKey(BSAdmin, on_delete=models.PROTECT)
+    tags = models.ManyToManyField(Tag, through=ProblemTag)

@@ -2,6 +2,8 @@ from utils.auxilary import *
 from models.models import *
 import random
 
+MAX_PROBLEM_AMOUNT = 50
+
 
 def split_tag(tag):
     return tag.split(' ')
@@ -28,7 +30,7 @@ def collect_problem(request):
         problemsid = list(problemsid)
 
         # 题目数量不能超过最大题数
-        total = min(amount, len(problemsid))
+        total = min(amount, len(problemsid), MAX_PROBLEM_AMOUNT)
 
         # 随机选题
         problems = random.sample(problemsid, total)
