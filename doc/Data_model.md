@@ -71,29 +71,29 @@
 
 ### Registration
 
-| 列名                | 数据类型及精度 | 约束条件                 | 说明               | 备注                                             |
-| ------------------- | -------------- | ------------------------ | ------------------ | ------------------------------------------------ |
-| userid              | varchar(30)    | FOREIGN KEY(User(id))    | 用户id             |                                                  |
-| contestid           | int            | FOREIGN KEY(Contest(id)) | 比赛id             |                                                  |
-| (userid, contestid) |                | INDEX                    | 索引               |                                                  |
-| regtime             | datetime       | NOT NULL                 | 登记比赛时间       |                                                  |
-| starttime           | datetime       |                          | 开始比赛时间       |                                                  |
-| currentnumber       | int            | NOT NULL                 | 当前做到的题号     | 注册时初始化为0                                  |
-| currenttime         | datetime       |                          | 当前题目的开始时间 | 实际上为上一道题提交时间(第一题则是开始比赛时间) |
-| correct             | int            |                          | 正确数量           |                                                  |
-| timecost            | int            |                          | 总耗时(s)          | 比赛结束后即是$currenttime-starttime$            |
-| score               | int            |                          | 得分               |                                                  |
-| rank                | int            |                          | 排名               |                                                  |
-| beforerating        | int            |                          | 更新前rating       |                                                  |
-| afterrating         | int            |                          | 更新后rating       |                                                  |
+| 列名                | 数据类型及精度 | 约束条件                    | 说明               | 备注                                             |
+| ------------------- | -------------- | --------------------------- | ------------------ | ------------------------------------------------ |
+| id                  | int            | PRIMARY KEY, AUTO_INCREMENT | 注册id             |                                                  |
+| userid              | varchar(30)    | FOREIGN KEY(User(id))       | 用户id             |                                                  |
+| contestid           | int            | FOREIGN KEY(Contest(id))    | 比赛id             |                                                  |
+| (userid, contestid) |                | INDEX                       | 索引               |                                                  |
+| regtime             | datetime       | NOT NULL                    | 登记比赛时间       |                                                  |
+| starttime           | datetime       |                             | 开始比赛时间       |                                                  |
+| currentnumber       | int            | NOT NULL                    | 当前做到的题号     | 注册时初始化为0                                  |
+| currenttime         | datetime       |                             | 当前题目的开始时间 | 实际上为上一道题提交时间(第一题则是开始比赛时间) |
+| correct             | int            |                             | 正确数量           |                                                  |
+| timecost            | int            |                             | 总耗时(s)          | 比赛结束后即是$currenttime-starttime$            |
+| score               | int            |                             | 得分               |                                                  |
+| rank                | int            |                             | 排名               |                                                  |
+| beforerating        | int            |                             | 更新前rating       |                                                  |
+| afterrating         | int            |                             | 更新后rating       |                                                  |
 
 ### Record
 
-| 列名                           | 数据类型及精度 | 约束条件                                              | 说明         | 备注 |
-| ------------------------------ | -------------- | ----------------------------------------------------- | ------------ | ---- |
-| userid                         | varchar(30)    | FOREIGN KEY(User(id))                                 | 用户id       |      |
-| contestid                      | int            | FOREIGN KEY(Contest(id))                              | 比赛id       |      |
-| problemid                      | int            | FOREIGN KEY(Problem(id))                              | 题目id       |      |
-| (userid, contestid, problemid) |                | INDEX                                                 | 索引         |      |
-| result                         | varchar(10)    | NOT NULL, CHECK(result in {"正确", "错误", "未作答"}) | 题目作答结果 |      |
-| submitted                      | varchar(100)   |                                                       | 提交的答案   |      |
+| 列名                    | 数据类型及精度 | 约束条件                                              | 说明         | 备注 |
+| ----------------------- | -------------- | ----------------------------------------------------- | ------------ | ---- |
+| registerid              | int            | FOREIGN KEY(Registration)                             | 注册id       |      |
+| problemno               | int            |                                                       | 题目序号     |      |
+| (registerid, problemno) |                | INDEX                                                 | 索引         |      |
+| result                  | varchar(10)    | NOT NULL, CHECK(result in {"正确", "错误", "未作答"}) | 题目作答结果 |      |
+| submitted               | varchar(100)   |                                                       | 提交的答案   |      |
