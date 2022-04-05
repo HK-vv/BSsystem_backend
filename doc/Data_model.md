@@ -90,10 +90,10 @@
 
 ### Record
 
-| 列名                    | 数据类型及精度 | 约束条件                                              | 说明         | 备注 |
-| ----------------------- | -------------- | ----------------------------------------------------- | ------------ | ---- |
-| registerid              | int            | FOREIGN KEY(Registration)                             | 注册id       |      |
-| problemno               | int            |                                                       | 题目序号     |      |
-| (registerid, problemno) |                | INDEX                                                 | 索引         |      |
-| result                  | varchar(10)    | NOT NULL, CHECK(result in {"正确", "错误", "未作答"}) | 题目作答结果 |      |
-| submitted               | varchar(100)   |                                                       | 提交的答案   |      |
+| 列名                    | 数据类型及精度 | 约束条件                                    | 说明         | 备注 |
+| ----------------------- | -------------- | ------------------------------------------- | ------------ | ---- |
+| registerid              | int            | FOREIGN KEY(Registration)                   | 注册id       |      |
+| problemno               | int            |                                             | 题目序号     |      |
+| (registerid, problemno) |                | INDEX                                       | 索引         |      |
+| result                  | varchar(10)    | NOT NULL, CHECK(result in {"正确", "错误"}) | 题目作答结果 |      |
+| submitted               | varchar(100)   |                                             | 提交的答案   |      |
