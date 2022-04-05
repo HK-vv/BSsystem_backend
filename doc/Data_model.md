@@ -66,7 +66,7 @@
 | contestid              | int            | FOREIGN KEY(Contest(id)) | 比赛id      |      |
 | problemid              | int            | FOREIGN KEY(Problem(id)) | 题目id      |      |
 | (problemid, contestid) |                | INDEX                    | 索引        |      |
-| number                 | int            | NOT NULL                 | 题目序号    |      |
+| number                 | int            | NOT NULL, UNIQUE         | 题目序号    |      |
 | duration               | int            | NOT NULL                 | 题目时限(s) |      |
 
 ### Registration
