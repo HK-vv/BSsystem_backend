@@ -8,8 +8,7 @@ from utils.decorators import *
 
 
 @require_nothing()
-def log_in(request):
-    data = json.loads(request.body)
+def log_in(request, data):
     usn = data['username']
     pwd = data['password']
     print(usn, "is logging in")
@@ -21,7 +20,7 @@ def log_in(request):
 
 
 @require_admin_login()
-def log_out(request):
+def log_out(request, data):
     if request.user.is_authenticated:
         logout(request)
     return msg_response(0)
