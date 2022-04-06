@@ -10,7 +10,7 @@
 
 #### 指令运行
 
-```cmd
+```bash
 # 下载后端文件
 git clone git@github.com:HK-vv/BSsystem_backend.git
 cd BSsystem_backend 
@@ -20,6 +20,8 @@ pip install django
 pip install requests
 
 # 建立本地数据库
+## 每次pull之后都要运行本段代码
+## 运行此步报错尝试删除bsmodels下的migrations并重新执行
 python manage.py makemigrations bsmodels
 python manage.py migrate
 
