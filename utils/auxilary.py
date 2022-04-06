@@ -3,10 +3,14 @@ import json
 from django.http import JsonResponse
 from bsmodels.models import *
 
+
 def get_data(request):
     if request.method == 'GET':
         return request.GET
-    return json.loads(request.body)
+    if request.body:
+        return json.loads(request.body)
+    return None
+
 
 def ret_response(ret, dic=None):
     if dic is None:
