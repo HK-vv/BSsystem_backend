@@ -31,7 +31,7 @@ def create_account(request, data):
 
 @require_admin_login()
 def get_account(request, data):
-    user = BSAdmin(request.user)
+    user = request.user
     info = {'username': user.username,
             'email': user.email,
             'phone': user.phone}
@@ -41,7 +41,7 @@ def get_account(request, data):
 @require_admin_login()
 def modify_account(request, data):
     nd = data['newdata']
-    user = BSAdmin(request.user)
+    user = request.user
     try:
         if nd.get('username'):
             user.username = nd.get('username')
@@ -67,7 +67,7 @@ def delete_account(request, data):
 def account_list(request, data):
     ps = int(data['pagesize'])
     pn = int(data['pagenum'])
-    kw = data.get('keyword')
+    kw = data['keyword']
 
     lst = BSAdmin.objects.all()
     if kw != "":
@@ -99,6 +99,6 @@ def reset_password(request, data):
 
 @require_admin_login()
 def integrity_verification(request, data):
-    user = BSAdmin(request.user)
+    user = request.user
     integrity = user.email is not None and user.phone is not None
     return ret_response(0, {'integrity': integrity})
