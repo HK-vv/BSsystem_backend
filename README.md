@@ -21,7 +21,7 @@ pip install requests
 
 # 建立本地数据库
 ## 每次pull之后都要运行本段代码
-## 运行此步报错尝试删除bsmodels下的migrations并重新执行
+## 运行此步报错尝试删除db.sqlite3和bsmodels/migrations并重新执行
 python manage.py makemigrations bsmodels
 python manage.py migrate
 
