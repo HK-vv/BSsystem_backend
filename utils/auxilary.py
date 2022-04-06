@@ -1,17 +1,21 @@
 from django.http import JsonResponse
-from models.models import *
+from bsmodels.models import *
+
+
+def ret_response(ret, dic=None):
+    if dic is None:
+        dic = {}
+    return JsonResponse({**{'ret': ret}, **dic})
 
 
 def msg_response(ret, msg=None):
     if ret == 2:
-        return JsonResponse({'ret': ret,
-                             'msg': '登录过期'})
+        return ret_response(ret, {'msg': "登陆过期"})
     if ret == 3:
-        return JsonResponse({'ret': ret,
-                             'msg': '其他错误'})
+        return ret_response(ret, {'msg': "其他错误"})
     if msg is None:
-        return JsonResponse({'ret': ret})
-    return JsonResponse({'ret': ret, 'msg': msg})
+        return ret_response(ret)
+    return ret_response(ret, {'msg': msg})
 
 
 def session_expired(request, keyword):

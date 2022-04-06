@@ -4,7 +4,7 @@ import requests
 import random
 from brainstorm.settings import APPID
 from brainstorm.settings import SECRET
-from models.models import *
+from bsmodels.models import BSUser
 from utils.auxilary import *
 
 

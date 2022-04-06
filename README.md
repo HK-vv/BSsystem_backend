@@ -20,7 +20,7 @@ pip install django
 pip install requests
 
 # 建立本地数据库
-python manage.py makemigrations models
+python manage.py makemigrations bsmodels
 python manage.py migrate
 
 # 运行后端

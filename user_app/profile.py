@@ -1,6 +1,6 @@
 from utils.handler import *
 from utils.auxilary import *
-from models.models import *
+from bsmodels.models import *
 
 
 def get_profile(request):

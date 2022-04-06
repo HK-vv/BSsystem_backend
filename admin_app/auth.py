@@ -2,7 +2,7 @@ import json
 
 from django.contrib.auth import login, authenticate, logout
 
-from models.bsadmin import BSAdmin
+from bsmodels.models import BSAdmin
 from utils.auxilary import msg_response
 from utils.decorators import *
 

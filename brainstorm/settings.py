@@ -33,7 +33,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'models.apps.ModelsConfig',
+    'bsmodels.apps.ModelsConfig',
     'user_app.apps.UserAppConfig',
     'admin_app.apps.AdminAppConfig',
     'django.contrib.admin',
@@ -124,4 +124,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'models.bsadmin'
+AUTH_USER_MODEL = 'bsmodels.BSAdmin'
+
+ATOMIC_REQUESTS = True

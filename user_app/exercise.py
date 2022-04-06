@@ -1,5 +1,6 @@
+from bsmodels.models import Problem, Tag, ProblemTag
 from utils.auxilary import *
-from models.models import *
+
 import random
 
 MAX_PROBLEM_AMOUNT = 50
