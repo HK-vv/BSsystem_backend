@@ -5,10 +5,7 @@ from functools import wraps
 from utils.auxilary import msg_response
 
 
-def get_data(request):
-    if request.method == 'GET':
-        return request.params
-    return json.loads(request.body)
+
 
 
 def require_nothing():

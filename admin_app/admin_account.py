@@ -1,3 +1,5 @@
+from django.core import serializers
+from django.core.paginator import Paginator
 from django.db import DatabaseError
 from django.http import JsonResponse
 
@@ -38,7 +40,21 @@ def get_account(request, data):
 
 @require_admin_login()
 def modify_account(request, data):
-    pass
+    nd = data['newdata']
+    user = BSAdmin(request.user)
+    try:
+        if nd.get('username'):
+            user.username = nd.get('username')
+        if nd.get('password'):
+            user.set_password(nd.get('password'))
+        if nd.get('email'):
+            user.username = nd.get('email')
+        if nd.get('phone'):
+            user.username = nd.get('phone')
+        user.save()
+    except DatabaseError:
+        return msg_response(1, "用户名已存在")
+    return msg_response(0)
 
 
 @require_super_login()
@@ -49,7 +65,20 @@ def delete_account(request, data):
 
 @require_admin_login()
 def account_list(request, data):
-    pass
+    ps = int(data['pagesize'])
+    pn = int(data['pagenum'])
+    kw = data.get('keyword')
+
+    lst = BSAdmin.objects.all()
+    if kw:
+        lst = lst.filter(username__icontains=kw)
+
+    tot = lst.count()
+    paginator = Paginator(lst, ps)
+    page = paginator.page(pn)
+    items = page.object_list.values('username', 'email', 'phone', 'is_superuser')
+
+    return ret_response(0, {'items': items, 'total': tot})
 
 
 @require_admin_login()
@@ -60,7 +89,11 @@ def is_super(request, data):
 
 @require_super_login()
 def reset_password(request, data):
-    pass
+    user = BSAdmin.objects.get(username=data['username'])
+    if user is None:
+        return msg_response(1, "用户名不存在")
+    user.set_password(BSAdmin.DEFAULT_PASSWORD)
+    return msg_response(0)
 
 
 @require_admin_login()
