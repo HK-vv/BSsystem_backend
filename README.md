@@ -6,7 +6,7 @@
 
 ### 使用说明书
 
-在使用前，请向后端管理员申请获得`secret.json`文件，并将其放置在`BSsystem_backend/`目录下。没有此文件无法正常运行。请不要传播`secret.json`文件。
+在使用前，请向后端管理员申请获得`secret.json`文件，并将其放置在`BSsystem_backend/`目录下。没有此文件无法正常运行。此文件应当被保密, 请不要传播`secret.json`文件。
 
 #### 指令运行
 
