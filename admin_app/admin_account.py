@@ -70,13 +70,14 @@ def account_list(request, data):
     kw = data.get('keyword')
 
     lst = BSAdmin.objects.all()
-    if kw:
+    if kw != "":
         lst = lst.filter(username__icontains=kw)
 
     tot = lst.count()
     paginator = Paginator(lst, ps)
     page = paginator.page(pn)
     items = page.object_list.values('username', 'email', 'phone', 'is_superuser')
+    items = list(items)
 
     return ret_response(0, {'items': items, 'total': tot})
 

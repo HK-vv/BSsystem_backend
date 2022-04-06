@@ -14,7 +14,7 @@ def user_list(request, data):
     st = data.get('sort_by_rating')
 
     lst = BSUser.objects.all()
-    if kw:
+    if kw != "":
         lst = lst.filter(username__icontains=kw)
     if st == 'descending':
         lst = lst.order_by('-rating')
@@ -25,6 +25,7 @@ def user_list(request, data):
     paginator = Paginator(lst, ps)
     page = paginator.page(pn)
     items = page.object_list.values('username', 'rating', matches=Count('registration'))
+    items = list(items)
 
     return ret_response(0, {'items': items, 'total': tot})
 
