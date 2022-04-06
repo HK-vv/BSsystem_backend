@@ -84,7 +84,7 @@ def account_list(request, data):
 
 @require_admin_login()
 def is_super(request, data):
-    user = BSAdmin(request.user)
+    user = request.user
     return ret_response(0, {'issuper': user.is_superuser})
 
 
