@@ -1,6 +1,7 @@
 from django.core import serializers
 from django.core.paginator import Paginator
 from django.db import DatabaseError
+from django.db.models.functions import Lower
 from django.http import JsonResponse
 
 from bsmodels.models import BSAdmin
@@ -23,7 +24,11 @@ def root_dispatcher(request):
 @require_super_login()
 def create_account(request, data):
     try:
-        BSAdmin.objects.create(username=data['username']).save()
+        BSAdmin.objects.create_user(username=data['username'],
+                                    password=BSAdmin.DEFAULT_PASSWORD)
+        nu = BSAdmin.objects.get(username=data['username'])
+        nu.email = None
+        nu.save()
     except DatabaseError:
         return msg_response(1, "用户名已存在")
     return msg_response(0)
@@ -78,6 +83,9 @@ def account_list(request, data):
     page = paginator.page(pn)
     items = page.object_list.values('username', 'email', 'phone', 'is_superuser')
     items = list(items)
+    for x in items:
+        x['usertype'] = 'super' if x['is_superuser'] else 'admin'
+        del x['is_superuser']
 
     return ret_response(0, {'items': items, 'total': tot})
 
