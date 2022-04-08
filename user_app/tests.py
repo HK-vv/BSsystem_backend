@@ -17,14 +17,14 @@ class Test(TestCase):
             'code': '061CM3Ha1BE6RC0NiAIa1zU6hf1CM3HK'
         }
 
-        response = requests.post(f'http://{self.localhost}:{self.port}/api/user/login',
+        response = requests.post(f'http://{self.localhost}:{self.port}/api/user/auth/login',
                                  json=payload)
         pprint.pprint(response.json())
         # pprint.pprint(response.cookies.values())
         self.cookie = response.cookies
 
     def test_logout(self):
-        response = requests.post(f'http://{self.localhost}:{self.port}/api/user/logout', cookies=self.cookie)
+        response = requests.post(f'http://{self.localhost}:{self.port}/api/user/auth/logout', cookies=self.cookie)
         pprint.pprint(response.json())
 
     def test_get_info(self):
@@ -54,5 +54,7 @@ class Test(TestCase):
 if __name__ == '__main__':
     t = Test()
     t.test_login()
-    t.test_collect('语文文', 4)
+    t.test_modify_info('eddie')
+    t.test_get_info()
+    # t.test_collect('语文文', 4)
     t.test_logout()

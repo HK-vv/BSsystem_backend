@@ -1,20 +1,17 @@
 import string
-import json
 import requests
 import random
 from brainstorm.settings import APPID
 from brainstorm.settings import SECRET
-from bsmodels.models import BSUser
+from utils.decorators import *
 from utils.auxilary import *
+from bsmodels.models import BSUser
 
 
 # 登陆
+@need_user_login()
 def login(request):
-    code = json.loads(request.body)
-    if "code" not in code:
-        return msg_response(3)
-
-    code = code['code']
+    code = request.params['code']
 
     response = requests.get(f'https://api.weixin.qq.com/sns/jscode2session?appid={APPID}&secret={SECRET}&js_code={code}'
                             '&grant_type=authorization_code')
@@ -50,10 +47,9 @@ def login(request):
                          'username': username})
 
 
+@require_user_login()
 def logout(request):
     # 使用登出方法
-    if session_expired(request, 'openid'):
-        return msg_response(2)
     openid = request.session['openid']
     username = BSUser.objects.get(openid=openid).username
     print(username + " 用户已登出")

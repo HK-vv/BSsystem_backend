@@ -1,6 +1,7 @@
-from bsmodels.models import Problem, Tag, ProblemTag
 from utils.auxilary import *
-
+from utils.decorators import *
+from bsmodels.models import Tag
+from bsmodels.models import ProblemTag
 import random
 
 MAX_PROBLEM_AMOUNT = 50
@@ -10,15 +11,8 @@ def split_tag(tag):
     return tag.split(' ')
 
 
+@require_user_login()
 def collect_problem(request):
-    # 检测是否登录过期
-    if session_expired(request, 'openid'):
-        return msg_response(2)
-
-    request.params = request.GET
-    if 'tag' not in request.params or 'amount' not in request.params:
-        return msg_response(3)
-
     tag = request.params['tag']
     amount = int(request.params['amount'])
     tag = split_tag(tag)
@@ -44,12 +38,8 @@ def collect_problem(request):
         return msg_response(1, msg='标签不存在')
 
 
+@require_user_login()
 def get_problem(request):
-    # 检测是否登录过期
-    if session_expired(request, 'openid'):
-        return msg_response(2)
-
-    request.params = request.GET
     if 'id' not in request.params:
         return msg_response(3)
     id = request.params['id']
@@ -84,15 +74,8 @@ def get_problem(request):
         return msg_response(1, msg='题目不存在')
 
 
+@require_user_login()
 def check(request):
-    # 检测是否登录过期
-    if session_expired(request, 'openid'):
-        return msg_response(2)
-
-    request.params = request.GET
-    if 'problem_id' not in request.params or 'answer' not in request.params:
-        return msg_response(3)
-
     problem_id = request.params['problem_id']
     ur_answer = request.params['answer']
 

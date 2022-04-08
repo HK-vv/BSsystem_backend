@@ -1,7 +1,6 @@
 import json
-
 from django.http import JsonResponse
-from bsmodels.models import *
+from bsmodels.models import Problem
 
 
 def get_data(request):
