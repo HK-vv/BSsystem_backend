@@ -54,7 +54,8 @@ class Test(TestCase):
 if __name__ == '__main__':
     t = Test()
     t.test_login()
-    t.test_modify_info('eddie')
-    t.test_get_info()
-    # t.test_collect('语文文', 4)
+    # t.test_modify_info('eddie')
+    # t.test_get_info()
+    # t.test_collect('语文', 4)
+    # t.test_get_problem(3)
     t.test_logout()

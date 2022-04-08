@@ -7,23 +7,30 @@ from utils.decorators import *
 from utils.auxilary import *
 from bsmodels.models import BSUser
 
+DEBUG = False
+
 
 # 登陆
 @need_user_login()
 def login(request):
     code = request.params['code']
 
-    response = requests.get(f'https://api.weixin.qq.com/sns/jscode2session?appid={APPID}&secret={SECRET}&js_code={code}'
-                            '&grant_type=authorization_code')
+    if DEBUG:
+        openid = code
+        session_key = code
 
-    info = response.json()
+    else:
+        response = requests.get(f'https://api.weixin.qq.com/sns/jscode2session?appid={APPID}&secret={SECRET}&js_code={code}'
+                                '&grant_type=authorization_code')
 
-    if 'errcode' in info:
-        return JsonResponse({'ret': info['errcode'], 'msg': info['errmsg']})
+        info = response.json()
 
-    openid = info['openid']
-    session_key = info['session_key']
-    # openid = code
+        if 'errcode' in info:
+            return JsonResponse({'ret': info['errcode'], 'msg': info['errmsg']})
+
+        openid = info['openid']
+        session_key = info['session_key']
+
     user = BSUser.objects.filter(openid=openid)
     # 不存在用户，注册
     if not user:

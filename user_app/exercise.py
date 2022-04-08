@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 from utils.auxilary import *
 from utils.decorators import *
 from bsmodels.models import Tag
@@ -21,7 +23,10 @@ def collect_problem(request):
         tags = Tag.objects.filter(name__in=tag)
         tagsid = tags.values('id')
 
-        problemsid = ProblemTag.objects.filter(tagid__in=tagsid).values_list('problemid', flat=True).distinct()
+        allproblemsid = list(ProblemTag.objects.filter(tagid__in=tagsid).
+                             values_list('problemid', flat=True).distinct())
+
+        problemsid = Problem.objects.filter(Q(id__in=allproblemsid) & Q(public=True)).values_list('id', flat=True)
         problemsid = list(problemsid)
 
         # 题目数量不能超过最大题数
