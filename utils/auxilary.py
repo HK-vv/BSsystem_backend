@@ -6,7 +6,7 @@ from bsmodels.models import Problem
 def get_data(request):
     if request.FILES:
         return request.POST
-    if request.method == 'GET':
+    if request.method in ('GET', 'DELETE'):
         return request.GET
     if request.body:
         return json.loads(request.body)

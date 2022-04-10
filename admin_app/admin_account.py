@@ -17,7 +17,7 @@ def root_dispatcher(request):
     if request.method == 'POST':
         return modify_account(request)
     if request.method == 'DELETE':
-        return modify_account(request)
+        return delete_account(request)
     return msg_response(3)
 
 
