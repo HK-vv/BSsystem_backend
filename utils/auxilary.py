@@ -4,6 +4,8 @@ from bsmodels.models import Problem
 
 
 def get_data(request):
+    if request.FILES:
+        return request.POST
     if request.method == 'GET':
         return request.GET
     if request.body:

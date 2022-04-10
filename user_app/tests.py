@@ -6,7 +6,7 @@ import requests
 # Create your tests here.
 class Test(TestCase):
     localhost = 'localhost'
-    port = '8080'
+    port = '8000'
     cookie = None
 
     def test_login(self):
@@ -56,6 +56,6 @@ if __name__ == '__main__':
     t.test_login()
     # t.test_modify_info('eddie')
     # t.test_get_info()
-    # t.test_collect('语文', 4)
+    t.test_collect('语文', 4)
     # t.test_get_problem(3)
     t.test_logout()

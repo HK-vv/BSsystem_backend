@@ -152,3 +152,6 @@ migrations/
 
 # frontend
 dist/
+
+# upload files
+files/
