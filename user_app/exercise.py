@@ -90,7 +90,7 @@ def check(request):
             msg_response(1, msg='题目未公开')
 
         return JsonResponse({'ret': 0,
-                             'correct': iscorrect(problem_id, ur_answer),
+                             'correct': problem.iscorrect(ur_answer),
                              'answer': problem.answer})
 
     except Problem.DoesNotExist:

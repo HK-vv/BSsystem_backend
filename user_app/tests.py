@@ -45,6 +45,10 @@ class Test(TestCase):
         response = requests.get(f'http://{self.localhost}:{self.port}/api/user/exercise/problem?id={id}', cookies=self.cookie)
         pprint.pprint(response.json())
 
+    def test_check(self, id, answer):
+        response = requests.get(f'http://{self.localhost}:{self.port}/api/user/exercise/problem/check?problem_id={id}&answer={answer}', cookies=self.cookie)
+        pprint.pprint(response.json())
+
     def test_collect(self, tag, amount):
         response = requests.get(f'http://{self.localhost}:{self.port}/api/user/exercise/collect?tag={tag}&amount={amount}',
                                 cookies=self.cookie)
@@ -56,6 +60,7 @@ if __name__ == '__main__':
     t.test_login()
     # t.test_modify_info('eddie')
     # t.test_get_info()
-    t.test_collect('语文', 4)
+    # t.test_collect('语文', 4)
     # t.test_get_problem(3)
+    t.test_check(1, 'A')
     t.test_logout()
