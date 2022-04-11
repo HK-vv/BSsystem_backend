@@ -25,23 +25,30 @@ class Test(TestCase):
         # result = resp.json()
         # pprint.pprint(result)
 
-        # with open('data/111.jpg', 'rb') as fp:
-        #     response = client.post(url, data={'file': fp})
-        #     json_resp = json.loads(response.content)
-        #     self.assertTrue('url' in json_resp)
-        #     self.assertEquals(len(json_resp), 1)
-
         response = requests.post(f'http://{self.localhost}:{self.port}/api/admin/auth/login',
                                  json=payload)
         pprint.pprint(response.json())
         # pprint.pprint(response.cookies.values())
         self.cookie = response.cookies
 
-    # def test_logout(self):
-    #     self.login()
-    #
-    #     response = requests.post(f'http://{self.localhost}:{self.port}/api/admin/auth/logout', cookies=self.cookie)
-    #     pprint.pprint(response.json())
+    def logout(self):
+        response = requests.post(f'http://{self.localhost}:{self.port}/api/admin/auth/logout', cookies=self.cookie)
+        pprint.pprint(response.json())
+
+    def test_batch_public(self):
+        self.login()
+        payload = {
+            "problems": [
+                100,
+                15,
+                14,
+                25,
+                39
+            ]
+        }
+        response = requests.post(f'http://{self.localhost}:{self.port}/api/admin/problem/batch/public',
+                                 cookies=self.cookie, json=payload)
+        pprint.pprint(response.json())
 
     # def test_batch_add(self):
     #     self.login()

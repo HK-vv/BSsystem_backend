@@ -113,3 +113,22 @@ def batch_add(request, data):
                                       tagid_id=id)
 
     return msg_response(0)
+
+
+@require_admin_login()
+def batch_public(request, data):
+    problems = data['problems']
+    user = request.user
+    already = []
+    with transaction.atomic():
+        for problemid in problems:
+            problem = Problem.objects.get(id=problemid)
+            if problem.authorid != user:
+                return msg_response(1, msg='权限不足')
+            if problem.public:
+                already.append(problemid)
+            else:
+                problem.public = True
+                problem.save()
+        return JsonResponse({'ret': 0,
+                             'already': already})
