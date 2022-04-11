@@ -50,6 +50,45 @@ class Test(TestCase):
                                  cookies=self.cookie, json=payload)
         pprint.pprint(response.json())
 
+    def test_add_problem(self):
+        self.login()
+        payload = {
+            "type": "multiple",
+            "tags": [
+                "算法",
+                "语文"
+            ],
+            "description": "请选出所有OJ",
+            "options": [
+                "Codeforces",
+                "DBforces",
+            ],
+            "answer": "ABC",
+            "public": True
+        }
+        response = requests.put(f'http://{self.localhost}:{self.port}/api/admin/problem',
+                                cookies=self.cookie, json=payload)
+        pprint.pprint(response.json())
+
+    def test_get_problem(self):
+        self.login()
+        response = requests.get(f'http://{self.localhost}:{self.port}/api/admin/problem?pagesize=10&pagenum=1&'
+                                f'keyword=出师表&tags=语文',
+                                cookies=self.cookie)
+        pprint.pprint(response.json())
+
+    def test_del_problem(self):
+        self.login()
+        payload = {
+          "problems": [
+            100,
+            101
+          ]
+        }
+        response = requests.delete(f'http://{self.localhost}:{self.port}/api/admin/problem',
+                                cookies=self.cookie, json=payload)
+        pprint.pprint(response.json())
+
     # def test_batch_add(self):
     #     self.login()
     #     with open('./files/test.xlsx', 'rb') as fp:

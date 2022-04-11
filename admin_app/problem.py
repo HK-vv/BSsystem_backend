@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from django.db import transaction
 from utils.decorators import *
 from brainstorm import settings
@@ -8,23 +9,23 @@ import openpyxl
 from bsmodels.models import Problem
 from bsmodels.models import Tag
 from bsmodels.models import ProblemTag
+from bsmodels.models import BSAdmin
+from utils.handler import dispatcher_base
 
 FOLDER_NAME = 'files'
 SAVED = True
 pd.set_option('display.max_columns', None)
 
 
-def data2problem(table, line, user):
-    data = table.iloc[line]
-
-    description = data['题目']
-    type = data['题型']
-    A = data['选项1']
-    B = data['选项2']
-    C = data['选项3']
-    D = data['选项4']
-    answer = data['正确答案']
-    public = True if data['是否公开'] == '公开' else False
+def data2problem(data, user):
+    description = data['description']
+    type = data['type']
+    A = data['A']
+    B = data['B']
+    C = data['C']
+    D = data['D']
+    answer = data['answer']
+    public = data['public']
 
     problem = Problem.objects.create(description=description,
                                      answer=answer,
@@ -32,28 +33,21 @@ def data2problem(table, line, user):
                                      authorid=user)
 
     # 单选 多选
-    if type in ['单选题', '多选题']:
-        if type == '单选题':
-            type = 'single'
-        else:
-            type = 'multiple'
+    if type in ['single', 'multiple']:
         if A and B and C and D:
             problem.A = A
             problem.B = B
             problem.C = C
             problem.D = D
         else:
-            raise Exception(f"第{line + 2}行选项为空")
+            raise Exception("该行选项为空")
     # 判断
-    elif type == '判断题':
-        type = 'binary'
+    elif type == 'binary':
         problem.A = '正确'
         problem.B = '错误'
-    # 填空
-    elif type == '填空题':
-        type = 'completion'
-    else:
-        raise Exception(f"第{line + 2}行题目类型错误")
+    # 非填空
+    elif type != 'completion':
+        raise Exception("该行题目类型错误")
 
     problem.type = type
     problem.save()
@@ -65,11 +59,12 @@ def excel2problems(table, user):
         with transaction.atomic():
             problems = []
             for i in range(len(table)):
-                problem = data2problem(table, i, user)
+                data = table.iloc[i]
+                problem = data2problem(data, user)
                 problems.append(problem)
             return problems
 
-    except Exception as e:
+    except Exception:
         raise Exception(f"第{i + 2}行格式错误")
 
 
@@ -93,11 +88,16 @@ def batch_add(request, data):
 
     try:
         table = pd.read_excel(file)
+        table.rename(columns={'题目': 'description', '题型': 'type', '选项1': 'A', '选项2': 'B', '选项3': 'C', '选项4': 'D',
+                              '正确答案': 'answer', '是否公开': 'public'}, inplace=True)
+        table.replace({"public": {'公开': True, '不公开': False}}, inplace=True)
+        table.replace({"type": {'单选题': 'single', '多选题': 'multiple',
+                                '判断题': 'binary', '填空题': 'completion'}}, inplace=True)
     except Exception:
         return msg_response(1, msg='文件格式有误')
 
     table = table.where(table.notnull(), None)
-    # print(table)
+    print(table)
     try:
         problems = excel2problems(table, user)
     except Exception as e:
@@ -130,5 +130,123 @@ def batch_public(request, data):
             else:
                 problem.public = True
                 problem.save()
-        return JsonResponse({'ret': 0,
-                             'already': already})
+        return ret_response(0, {'already': already})
+
+
+def problem_dispatcher(request):
+    method2handler = {
+        'GET': get_problem,
+        'POST': modify_problem,
+        'PUT': add_problem,
+        'DELETE': del_problem
+    }
+    return dispatcher_base(request, method2handler)
+
+
+@require_admin_login()
+def get_problem(request, data):
+    pagesize = int(data['pagesize'])
+    pagenum = int(data['pagenum'])
+
+    lst = Problem.objects.all()
+
+    if 'type' in data and data['type'] != "":
+        type = data['type']
+        lst = lst.filter(type=type)
+
+    if 'tags' in data and data['tags'] != "":
+        tags = data['tags'].split(' ')
+        tags = list(Tag.objects.filter(name__in=tags))
+        problemsid = list(ProblemTag.objects.filter(tagid__in=tags).values_list('problemid', flat=True))
+        lst = lst.filter(id__in=problemsid)
+
+    if 'author' in data and data['author'] != "":
+        author = data['author']
+        author = BSAdmin.objects.get(username__icontains=author)
+        lst = lst.filter(authorid=author)
+
+    if 'public' in data and data['public'] != "":
+        public = True if data['public'] == '1' else False
+        lst = lst.filter(public=public)
+
+    if 'keyword' in data and data['keyword'] != "":
+        keyword = data['keyword']
+        lst = lst.filter(description__icontains=keyword)
+
+    total = lst.count()
+    paginator = Paginator(lst, pagesize)
+    page = paginator.page(pagenum)
+    items = page.object_list.values()
+    temp = list(items)
+    items = []
+
+    for x in temp:
+        problemid = x['id']
+        item = {'problemid': problemid,
+                'type': x['type'],
+                'description': x['description'],
+                'answer': x['answer'],
+                'public': x['public']}
+
+        tagsid = list(ProblemTag.objects.filter(problemid_id=problemid).values_list('tagid', flat=True))
+        tags = list(Tag.objects.filter(id__in=tagsid).values_list('name', flat=True))
+        item['tags'] = tags
+
+        options = []
+        for i in range(4):
+            if x[chr(ord('A') + i)] is not None:
+                options.append(x[chr(ord('A') + i)])
+        item['options'] = options
+
+        authorid = x['authorid_id']
+        author = BSAdmin.objects.get(id=authorid).username
+        item['author'] = author
+
+        items.append(item)
+
+    return ret_response(0, {'items': items, 'total': total})
+
+
+@require_admin_login()
+def modify_problem(request, data):
+    pass
+
+
+@require_admin_login()
+def add_problem(request, data):
+    user = request.user
+    try:
+        info = {'type': data['type'],
+                'description': data['description'],
+                'answer': data['answer'],
+                'public': data['public']}
+
+        for i in range(4):
+            info[chr(ord('A') + i)] = None if i >= len(data['options']) \
+                                           else data['options'][i]
+
+        problem = data2problem(info, user)
+
+        tags = data['tags']
+        tagsid = list(Tag.objects.filter(name__in=tags).values_list('id', flat=True))
+
+        for id in tagsid:
+            ProblemTag.objects.create(problemid=problem,
+                                      tagid_id=id)
+        return msg_response(0)
+
+    except Exception as e:
+        traceback.print_exc()
+        print(e.args)
+        return msg_response(1, '题目格式有误')
+
+
+@require_admin_login()
+def del_problem(request, data):
+    print(request.GET)
+    print(request.body)
+    problems = data['problems']
+    # problems = data['problems'].split(' ')
+    for id in problems:
+        Problem.objects.get(id=id).delete()
+    return msg_response(0)
