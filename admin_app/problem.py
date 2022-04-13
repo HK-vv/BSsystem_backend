@@ -147,8 +147,7 @@ def problem_dispatcher(request):
     method2handler = {
         'GET': get_problem,
         'POST': modify_problem,
-        'PUT': add_problem,
-        'DELETE': del_problem
+        'PUT': add_problem
     }
     return dispatcher_base(request, method2handler)
 
@@ -284,8 +283,7 @@ def add_problem(request, data):
 
 @require_admin_login
 def del_problem(request, data):
-    print(request.GET)
-    print(request.body)
+    # print(request.body)
     problems = data['problems']
     # problems = data['problems'].split(' ')
     for id in problems:

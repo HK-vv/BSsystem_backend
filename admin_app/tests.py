@@ -85,7 +85,7 @@ class Test(TestCase):
             101
           ]
         }
-        response = requests.delete(f'http://{self.localhost}:{self.port}/api/admin/problem',
+        response = requests.put(f'http://{self.localhost}:{self.port}/api/admin/problem/batch/delete',
                                 cookies=self.cookie, json=payload)
         pprint.pprint(response.json())
 

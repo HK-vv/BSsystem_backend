@@ -14,5 +14,6 @@ urlpatterns = [
     path('tag', tag.tag_dispatcher),
     path('problem', problem.problem_dispatcher),
     path('problem/batch/add', problem.batch_add),
-    path('problem/batch/public', problem.batch_public)
+    path('problem/batch/public', problem.batch_public),
+    path('problem/batch/delete', problem.del_problem),
 ]
