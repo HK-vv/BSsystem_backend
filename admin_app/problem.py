@@ -285,9 +285,13 @@ def add_problem(request, data):
 
 @require_admin_login
 def del_problem(request, data):
-    # print(request.body)
     problems = data['problems']
-    # problems = data['problems'].split(' ')
-    for id in problems:
-        Problem.objects.get(id=id).delete()
+    try:
+        with transaction.atomic():
+            for id in problems:
+                Problem.objects.get(id=id).delete()
+    except Exception as e:
+        traceback.print_exc()
+        print(e.args)
+        return msg_response(1, f'题目{id}不存在')
     return msg_response(0)

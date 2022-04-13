@@ -36,7 +36,7 @@ class Problem(models.Model):
     D = models.CharField(max_length=50, null=True)
     answer = models.CharField(max_length=100)
     public = models.BooleanField()
-    authorid = models.ForeignKey(BSAdmin, on_delete=models.PROTECT)
+    authorid = models.ForeignKey(BSAdmin, on_delete=models.SET_NULL, blank=True, null=True)
     # tags = models.ManyToManyField(Tag, through=ProblemTag)
 
     # 选择题
@@ -113,13 +113,13 @@ class Contest(models.Model):
     latest = models.DateTimeField()
     password = models.CharField(max_length=30, null=True)
     rated = models.BooleanField()
-    authorid = models.ForeignKey(BSAdmin, on_delete=models.PROTECT)
+    authorid = models.ForeignKey(BSAdmin, on_delete=models.SET_NULL, blank=True, null=True)
     # problems = models.ManyToManyField(Problem, through=ContestProblem)
 
 
 class ContestProblem(models.Model):
-    contestid = models.ForeignKey(Contest, on_delete=models.PROTECT)
-    problemid = models.ForeignKey(Problem, on_delete=models.PROTECT)
+    contestid = models.ForeignKey(Contest, on_delete=models.SET_NULL, blank=True, null=True)
+    problemid = models.ForeignKey(Problem, on_delete=models.SET_NULL, blank=True, null=True)
     number = models.IntegerField()
     duration = models.IntegerField()
 
@@ -133,13 +133,13 @@ class Tag(models.Model):
 
 
 class ProblemTag(models.Model):
-    problemid = models.ForeignKey(Problem, on_delete=models.PROTECT)
-    tagid = models.ForeignKey(Tag, on_delete=models.PROTECT)
+    problemid = models.ForeignKey(Problem, on_delete=models.SET_NULL, blank=True, null=True)
+    tagid = models.ForeignKey(Tag, on_delete=models.SET_NULL, blank=True, null=True)
 
 
 class Registration(models.Model):
-    userid = models.ForeignKey(BSUser, on_delete=models.PROTECT)
-    contestid = models.ForeignKey(Contest, on_delete=models.PROTECT)
+    userid = models.ForeignKey(BSUser, on_delete=models.SET_NULL, blank=True, null=True)
+    contestid = models.ForeignKey(Contest, on_delete=models.SET_NULL, blank=True, null=True)
     regtime = models.DateTimeField()
     starttime = models.DateTimeField(null=True)
     currentnumber = models.IntegerField(default=0)
@@ -156,9 +156,9 @@ class Registration(models.Model):
 
 
 class Record(models.Model):
-    userid = models.ForeignKey(BSUser, on_delete=models.PROTECT)
-    contestid = models.ForeignKey(Contest, on_delete=models.PROTECT)
-    problemid = models.ForeignKey(Problem, on_delete=models.PROTECT)
+    userid = models.ForeignKey(BSUser, on_delete=models.SET_NULL, blank=True, null=True)
+    contestid = models.ForeignKey(Contest, on_delete=models.SET_NULL, blank=True, null=True)
+    problemid = models.ForeignKey(Problem, on_delete=models.SET_NULL, blank=True, null=True)
     result = models.CharField(max_length=10, choices=[("正确", "正确"), ("错误", "错误")])
     submitted = models.CharField(max_length=100, null=True)
 
