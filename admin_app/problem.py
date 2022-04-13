@@ -27,10 +27,16 @@ def data2problem(data, user):
     answer = data['answer']
     public = data['public']
 
-    problem = Problem.objects.create(description=description,
-                                     answer=answer,
-                                     public=public,
-                                     authorid=user)
+    # an alternative way to do this
+    problem = Problem(description=description,
+                      answer=answer,
+                      public=public,
+                      authorid=user)
+
+    # problem = Problem.objects.create(description=description,
+    #                                  answer=answer,
+    #                                  public=public,
+    #                                  authorid=user)
 
     # 单选 多选
     if type in ['single', 'multiple']:
@@ -45,12 +51,15 @@ def data2problem(data, user):
     elif type == 'binary':
         problem.A = '正确'
         problem.B = '错误'
-    # 非填空
-    elif type != 'completion':
-        raise Exception("该行题目类型错误")
+        problem.C = problem.D = None
+    # 填空
+    elif type == 'completion':
+        problem.A = problem.B = problem.C = problem.D = None
+    # 异常
+    else:
+        raise Exception("题目类型错误")
 
     problem.type = type
-    problem.save()
     return problem
 
 
@@ -61,6 +70,7 @@ def excel2problems(table, user):
             for i in range(len(table)):
                 data = table.iloc[i]
                 problem = data2problem(data, user)
+                problem.save()
                 problems.append(problem)
             return problems
 
@@ -123,7 +133,7 @@ def batch_public(request, data):
     with transaction.atomic():
         for problemid in problems:
             problem = Problem.objects.get(id=problemid)
-            if problem.authorid != user:
+            if problem.authorid != user and not user.is_superuser:
                 return msg_response(1, msg='权限不足')
             if problem.public:
                 already.append(problemid)
@@ -212,36 +222,34 @@ def modify_problem(request, data):
     user = request.user
     id = data['problemid']
     nd = data['newdata']
-    tp = nd.get('type')
-    tg = nd.get('tags')
-    ds = nd.get('description')
-    op = nd.get('options')
-    an = nd.get('answer')
-    pb = nd.get('public')
+    tg = nd['tags']
+
+    prob = Problem.objects.get(id=id)
+    author = prob.authorid
+    if prob.authorid != user and not user.is_superuser:
+        return msg_response(1, "权限不足")
+
+    for i in range(4):
+        nd[chr(ord('A') + i)] = None if i >= len(nd['options']) \
+            else nd['options'][i]
+    del nd['options']
 
     try:
-        prob = Problem.objects.get(id=id)
-        if tp:
-            prob.type = tp
-        if ds:
-            prob.description = ds
-        if op:
-            pass
-        if an:
-            prob.answer = an
-        if pb:
-            assert pb
-            prob.public = pb
-        # Check whether problem now is legal. If not, do nothing and return error.
-        # umm, should I use data2problem?
+        np = data2problem(nd, author)
+        np.id = prob.id
+    except Exception as e:
+        return msg_response(1, e.args)
 
-        if tg:  # do this last
-            ProblemTag.objects.filter(problemid_id=id).delete()
-            for t in tg:
-                tag = Tag.objects.get(name=t)
-                ProblemTag.objects.create(problemid=prob, tagid=tag).save()
+    try:
+        np.save()
+        # update tags now
+        ProblemTag.objects.filter(problemid_id=id).delete()
+        for t in tg:
+            tag = Tag.objects.get(name=t)
+            ProblemTag.objects.create(problemid=prob, tagid=tag).save()
     except DatabaseError:
         return msg_response(1, "修改失败")
+    return msg_response(0)
 
 
 @require_admin_login()
@@ -258,6 +266,7 @@ def add_problem(request, data):
                 else data['options'][i]
 
         problem = data2problem(info, user)
+        problem.save()
 
         tags = data['tags']
         tagsid = list(Tag.objects.filter(name__in=tags).values_list('id', flat=True))
