@@ -7,4 +7,5 @@ from utils.decorators import require_nothing
 def tag_list(request, data):
     tags = Tag.objects.all().values_list('name', flat=True)
     tot = tags.count()
+    tags = list(tags)
     return ret_response(0, {'tags': tags, 'total': tot})
