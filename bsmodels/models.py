@@ -133,8 +133,8 @@ class Tag(models.Model):
 
 
 class ProblemTag(models.Model):
-    problemid = models.ForeignKey(Problem, on_delete=models.SET_NULL, blank=True, null=True)
-    tagid = models.ForeignKey(Tag, on_delete=models.SET_NULL, blank=True, null=True)
+    problemid = models.ForeignKey(Problem, on_delete=models.CASCADE, blank=True, null=True)
+    tagid = models.ForeignKey(Tag, on_delete=models.CASCADE, blank=True, null=True)
 
 
 class Registration(models.Model):

@@ -37,6 +37,5 @@ def modify_tag(request, data):
 
 @require_super_login
 def delete_tag(request, data):
-    for tag in data['tags']:
-        Tag.objects.get(name=tag).delete()
+    Tag.objects.get(name=data['tag']).delete()
     return msg_response(0)
