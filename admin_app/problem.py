@@ -81,8 +81,10 @@ def excel2problems(table, user):
 @require_admin_login
 def batch_add(request, data):
     tags = data['tags']
+    tags = tags.split(',')
     user = request.user
 
+    # print(tags, type(tags))
     # 获取上传文件的数据
     file = request.FILES.get('file')
     file_name = file.name
@@ -107,7 +109,7 @@ def batch_add(request, data):
         return msg_response(1, msg='文件格式有误')
 
     table = table.where(table.notnull(), None)
-    print(table)
+    # print(table)
     try:
         problems = excel2problems(table, user)
     except Exception as e:
