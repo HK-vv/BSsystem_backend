@@ -7,18 +7,17 @@ from django.http import JsonResponse
 from bsmodels.models import BSAdmin
 from utils.auxilary import msg_response, ret_response
 from utils.decorators import require_admin_login, require_super_login
+from utils.handler import dispatcher_base
 
 
 def root_dispatcher(request):
-    if request.method == 'PUT':
-        return create_account(request)
-    if request.method == 'GET':
-        return get_account(request)
-    if request.method == 'POST':
-        return modify_account(request)
-    if request.method == 'DELETE':
-        return delete_account(request)
-    return msg_response(3)
+    method2handler = {
+        'GET': get_account,
+        'POST': modify_account,
+        'PUT': create_account,
+        'DELETE': delete_account
+    }
+    return dispatcher_base(request, method2handler)
 
 
 @require_super_login()

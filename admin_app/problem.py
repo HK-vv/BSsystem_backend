@@ -1,5 +1,5 @@
 from django.core.paginator import Paginator
-from django.db import transaction
+from django.db import transaction, DatabaseError
 from utils.decorators import *
 from brainstorm import settings
 import os
@@ -209,7 +209,39 @@ def get_problem(request, data):
 
 @require_admin_login()
 def modify_problem(request, data):
-    pass
+    user = request.user
+    id = data['problemid']
+    nd = data['newdata']
+    tp = nd.get('type')
+    tg = nd.get('tags')
+    ds = nd.get('description')
+    op = nd.get('options')
+    an = nd.get('answer')
+    pb = nd.get('public')
+
+    try:
+        prob = Problem.objects.get(id=id)
+        if tp:
+            prob.type = tp
+        if ds:
+            prob.description = ds
+        if op:
+            pass
+        if an:
+            prob.answer = an
+        if pb:
+            assert pb
+            prob.public = pb
+        # Check whether problem now is legal. If not, do nothing and return error.
+        # umm, should I use data2problem?
+
+        if tg:  # do this last
+            ProblemTag.objects.filter(problemid_id=id).delete()
+            for t in tg:
+                tag = Tag.objects.get(name=t)
+                ProblemTag.objects.create(problemid=prob, tagid=tag).save()
+    except DatabaseError:
+        return msg_response(1, "修改失败")
 
 
 @require_admin_login()
@@ -223,7 +255,7 @@ def add_problem(request, data):
 
         for i in range(4):
             info[chr(ord('A') + i)] = None if i >= len(data['options']) \
-                                           else data['options'][i]
+                else data['options'][i]
 
         problem = data2problem(info, user)
 
