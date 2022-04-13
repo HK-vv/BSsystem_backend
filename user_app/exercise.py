@@ -13,7 +13,7 @@ def split_tag(tag):
     return tag.split(' ')
 
 
-@require_user_login()
+@require_user_login
 def collect_problem(request):
     tag = request.params['tag']
     amount = int(request.params['amount'])
@@ -43,7 +43,7 @@ def collect_problem(request):
         return msg_response(1, msg='标签不存在')
 
 
-@require_user_login()
+@require_user_login
 def get_problem(request):
     if 'id' not in request.params:
         return msg_response(3)
@@ -79,7 +79,7 @@ def get_problem(request):
         return msg_response(1, msg='题目不存在')
 
 
-@require_user_login()
+@require_user_login
 def check(request):
     problem_id = request.params['problem_id']
     ur_answer = request.params['answer']

@@ -15,7 +15,7 @@ def tag_dispatcher(request):
     return dispatcher_base(request, method2handler)
 
 
-@require_super_login()
+@require_super_login
 def add_tag(request, data):
     try:
         Tag.objects.create(name=data['tag']).save()
@@ -24,7 +24,7 @@ def add_tag(request, data):
     return msg_response(0)
 
 
-@require_super_login()
+@require_super_login
 def modify_tag(request, data):
     try:
         tag = Tag.objects.get(name=data['oldname'])
@@ -35,7 +35,7 @@ def modify_tag(request, data):
     return msg_response(0)
 
 
-@require_super_login()
+@require_super_login
 def delete_tag(request, data):
     for tag in data['tags']:
         Tag.objects.get(name=tag).delete()

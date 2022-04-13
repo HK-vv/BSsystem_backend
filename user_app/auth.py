@@ -11,7 +11,7 @@ DEBUG = False
 
 
 # 登陆
-@need_user_login()
+@need_user_login
 def login(request):
     code = request.params['code']
 
@@ -54,7 +54,7 @@ def login(request):
                          'username': username})
 
 
-@require_user_login()
+@require_user_login
 def logout(request):
     # 使用登出方法
     openid = request.session['openid']

@@ -20,7 +20,7 @@ def root_dispatcher(request):
     return dispatcher_base(request, method2handler)
 
 
-@require_super_login()
+@require_super_login
 def create_account(request, data):
     try:
         BSAdmin.objects.create_user(username=data['username'],
@@ -33,7 +33,7 @@ def create_account(request, data):
     return msg_response(0)
 
 
-@require_admin_login()
+@require_admin_login
 def get_account(request, data):
     user = request.user
     info = {'username': user.username,
@@ -42,7 +42,7 @@ def get_account(request, data):
     return ret_response(0, {'info': info})
 
 
-@require_admin_login()
+@require_admin_login
 def modify_account(request, data):
     nd = data['newdata']
     user = request.user
@@ -61,13 +61,13 @@ def modify_account(request, data):
     return msg_response(0)
 
 
-@require_super_login()
+@require_super_login
 def delete_account(request, data):
     BSAdmin.objects.get(username=data['username']).delete()
     return msg_response(0)
 
 
-@require_admin_login()
+@require_admin_login
 def account_list(request, data):
     ps = int(data['pagesize'])
     pn = int(data['pagenum'])
@@ -89,13 +89,13 @@ def account_list(request, data):
     return ret_response(0, {'items': items, 'total': tot})
 
 
-@require_admin_login()
+@require_admin_login
 def is_super(request, data):
     user = request.user
     return ret_response(0, {'issuper': user.is_superuser})
 
 
-@require_super_login()
+@require_super_login
 def reset_password(request, data):
     user = BSAdmin.objects.get(username=data['username'])
     if user is None:
@@ -104,7 +104,7 @@ def reset_password(request, data):
     return msg_response(0)
 
 
-@require_admin_login()
+@require_admin_login
 def integrity_verification(request, data):
     user = request.user
     integrity = user.email is not None and user.phone is not None

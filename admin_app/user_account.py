@@ -6,7 +6,7 @@ from utils.auxilary import ret_response
 from utils.decorators import require_admin_login
 
 
-@require_admin_login()
+@require_admin_login
 def user_list(request, data):
     ps = int(data['pagesize'])
     pn = int(data['pagenum'])
@@ -30,6 +30,6 @@ def user_list(request, data):
     return ret_response(0, {'items': items, 'total': tot})
 
 
-@require_admin_login()
+@require_admin_login
 def user_contest_history(request, data):
     pass

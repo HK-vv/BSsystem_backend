@@ -4,7 +4,7 @@ from bsmodels.models import BSUser
 from utils.decorators import *
 
 
-@require_user_login()
+@require_user_login
 def get_profile(request):
     # 检测是否登录过期
     if session_expired(request, 'openid'):
@@ -24,7 +24,7 @@ def get_profile(request):
         return msg_response(1, msg='用户不存在')
 
 
-@require_user_login()
+@require_user_login
 def modify_profile(request):
     # 检测是否登录过期
     if session_expired(request, 'openid'):

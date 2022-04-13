@@ -7,7 +7,7 @@ from utils.auxilary import msg_response
 from utils.decorators import *
 
 
-@require_nothing()
+@require_nothing
 def log_in(request, data):
     usn = data['username']
     pwd = data['password']
@@ -19,7 +19,7 @@ def log_in(request, data):
     return msg_response(0)
 
 
-@require_admin_login()
+@require_admin_login
 def log_out(request, data):
     if request.user.is_authenticated:
         logout(request)

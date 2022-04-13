@@ -78,7 +78,7 @@ def excel2problems(table, user):
         raise Exception(f"第{i + 2}行格式错误")
 
 
-@require_admin_login()
+@require_admin_login
 def batch_add(request, data):
     tags = data['tags']
     user = request.user
@@ -125,7 +125,7 @@ def batch_add(request, data):
     return msg_response(0)
 
 
-@require_admin_login()
+@require_admin_login
 def batch_public(request, data):
     problems = data['problems']
     user = request.user
@@ -153,7 +153,7 @@ def problem_dispatcher(request):
     return dispatcher_base(request, method2handler)
 
 
-@require_admin_login()
+@require_admin_login
 def get_problem(request, data):
     pagesize = int(data['pagesize'])
     pagenum = int(data['pagenum'])
@@ -217,7 +217,7 @@ def get_problem(request, data):
     return ret_response(0, {'items': items, 'total': total})
 
 
-@require_admin_login()
+@require_admin_login
 def modify_problem(request, data):
     user = request.user
     id = data['problemid']
@@ -252,7 +252,7 @@ def modify_problem(request, data):
     return msg_response(0)
 
 
-@require_admin_login()
+@require_admin_login
 def add_problem(request, data):
     user = request.user
     try:
@@ -282,7 +282,7 @@ def add_problem(request, data):
         return msg_response(1, '题目格式有误')
 
 
-@require_admin_login()
+@require_admin_login
 def del_problem(request, data):
     print(request.GET)
     print(request.body)
