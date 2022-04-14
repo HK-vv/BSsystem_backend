@@ -173,8 +173,8 @@ def get_problem(request, data):
 
     if 'author' in data and data['author'] != "":
         author = data['author']
-        author = BSAdmin.objects.get(username__icontains=author)
-        lst = lst.filter(authorid=author)
+        author = BSAdmin.objects.filter(username__icontains=author)
+        lst = lst.filter(authorid__in=author)
 
     if 'public' in data and data['public'] != "":
         public = True if data['public'] == '1' else False
