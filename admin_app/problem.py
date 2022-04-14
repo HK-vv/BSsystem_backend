@@ -162,8 +162,8 @@ def get_problem(request, data):
     lst = Problem.objects.all()
 
     if 'type' in data and data['type'] != "":
-        type = data['type']
-        lst = lst.filter(type=type)
+        type = data['type'].split(' ')
+        lst = lst.filter(type__in=type)
 
     if 'tags' in data and data['tags'] != "":
         tags = data['tags'].split(' ')

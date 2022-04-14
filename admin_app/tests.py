@@ -73,7 +73,7 @@ class Test(TestCase):
     def test_get_problem(self):
         self.login()
         response = requests.get(f'http://{self.localhost}:{self.port}/api/admin/problem?pagesize=10&pagenum=1&'
-                                f'keyword=出师表&tags=语文',
+                                f'type=single+binary',
                                 cookies=self.cookie)
         pprint.pprint(response.json())
 
