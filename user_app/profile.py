@@ -5,11 +5,7 @@ from utils.decorators import *
 
 
 @require_user_login
-def get_profile(request):
-    # 检测是否登录过期
-    if session_expired(request, 'openid'):
-        return msg_response(ret=2)
-
+def get_profile(request, data):
     openid = request.session['openid']
 
     try:
@@ -25,17 +21,10 @@ def get_profile(request):
 
 
 @require_user_login
-def modify_profile(request):
-    # 检测是否登录过期
-    if session_expired(request, 'openid'):
-        return msg_response(2)
-
+def modify_profile(request, data):
     openid = request.session['openid']
 
-    if 'newdata' not in request.params:
-        return msg_response(3)
-
-    newdata = request.params['newdata']
+    newdata = data['newdata']
     try:
         user = BSUser.objects.get(openid=openid)
         if 'username' in newdata:

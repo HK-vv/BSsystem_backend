@@ -12,8 +12,8 @@ DEBUG = False
 
 # 登陆
 @need_user_login
-def login(request):
-    code = request.params['code']
+def login(request, data):
+    code = data['code']
 
     if DEBUG:
         openid = code
@@ -55,7 +55,7 @@ def login(request):
 
 
 @require_user_login
-def logout(request):
+def logout(request, data):
     # 使用登出方法
     openid = request.session['openid']
     username = BSUser.objects.get(openid=openid).username

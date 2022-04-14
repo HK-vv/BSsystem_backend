@@ -14,9 +14,9 @@ def split_tag(tag):
 
 
 @require_user_login
-def collect_problem(request):
-    tag = request.params['tag']
-    amount = int(request.params['amount'])
+def collect_problem(request, data):
+    tag = data['tag']
+    amount = int(data['amount'])
     tag = split_tag(tag)
 
     try:
@@ -44,10 +44,8 @@ def collect_problem(request):
 
 
 @require_user_login
-def get_problem(request):
-    if 'id' not in request.params:
-        return msg_response(3)
-    id = request.params['id']
+def get_problem(request, data):
+    id = data['id']
 
     try:
         problem = Problem.objects.get(id=id)
@@ -80,9 +78,9 @@ def get_problem(request):
 
 
 @require_user_login
-def check(request):
-    problem_id = request.params['problem_id']
-    ur_answer = request.params['answer']
+def check(request, data):
+    problem_id = data['problem_id']
+    ur_answer = data['answer']
 
     try:
         problem = Problem.objects.get(id=problem_id)

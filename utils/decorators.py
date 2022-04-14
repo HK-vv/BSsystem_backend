@@ -52,8 +52,7 @@ def need_user_login(func):
     @wraps(func)
     def inner(request, *args, **kwargs):
         try:
-            request.params = get_data(request)
-            return func(request, *args, **kwargs)
+            return func(request, get_data(request), *args, **kwargs)
         except Exception as e:
             traceback.print_exc()
             print(e.args)
@@ -68,8 +67,7 @@ def require_user_login(func):
         if session_expired(request, 'openid'):
             return msg_response(2)
         try:
-            request.params = get_data(request)
-            return func(request, *args, **kwargs)
+            return func(request, get_data(request), *args, **kwargs)
         except Exception as e:
             traceback.print_exc()
             print(e.args)
