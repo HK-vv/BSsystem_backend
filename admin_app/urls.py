@@ -1,5 +1,5 @@
 from django.urls import path
-from admin_app import auth, admin_account, user_account, problem, tag
+from admin_app import auth, admin_account, user_account, problem, tag, contest
 
 urlpatterns = [
     path('auth/login', auth.log_in),
@@ -16,4 +16,6 @@ urlpatterns = [
     path('problem/batch/add', problem.batch_add),
     path('problem/batch/public', problem.batch_public),
     path('problem/batch/delete', problem.del_problem),
+    path('contest', contest.contest_dispatcher),
+    path('contest/batch/delete', contest.del_contest),
 ]

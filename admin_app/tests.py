@@ -109,9 +109,59 @@ class Test(TestCase):
                                  cookies=self.cookie, json=payload)
         pprint.pprint(response.json())
 
-    # def test_batch_add(self):
-    #     self.login()
-    #     with open('./files/test.xlsx', 'rb') as fp:
-    #         response = requests.post(f'http://{self.localhost}:{self.port}/api/admin/problem/batch/add',
-    #                                  cookies=self.cookie, files=fp)
-    #     pprint.pprint(response.json())
+    def test_add_contest(self):
+        self.login()
+        payload = {
+            "name": "April Fools Day Contest 2023",
+            "start": "2022-04-01 22:35:00",
+            "latest": "2022-04-01 22:45:00",
+            "password": "brainstorm",
+            "rated": True,
+            "time_limited": {
+                "single": 30,
+                "multiple": 40,
+                "binary": 30,
+                "completion": 60
+            },
+            "problems": [
+                50, 51, 52, 53, 54, 55, 56, 57
+            ],
+            "ordered": False
+        }
+        response = requests.put(f'http://{self.localhost}:{self.port}/api/admin/contest',
+                                cookies=self.cookie, json=payload)
+        pprint.pprint(response.json())
+
+    def test_get_contest(self):
+        self.login()
+        response = requests.get(f'http://{self.localhost}:{self.port}/api/admin/contest?contestid=2',
+                                cookies=self.cookie)
+        pprint.pprint(response.json())
+
+    def test_modify_contest(self):
+        self.login()
+        payload = {
+            "contestid": 2,
+            "newdata": {
+                "name": "April Fools Day Contest 2023",
+                "start": "2023-04-01 22:35:00",
+                "latest": "2024-04-01 22:45:00",
+                "password": "brainstorm",
+                "rated": True,
+                "time_limited": {
+                    "single": 30,
+                    "multiple": 40,
+                    "binary": 30,
+                    "completion": 60
+                },
+                "problems": [
+                    50, 51, 52
+                ],
+                "ordered": False
+            }
+        }
+        response = requests.post(f'http://{self.localhost}:{self.port}/api/admin/contest',
+                                cookies=self.cookie, json=payload)
+        pprint.pprint(response.json())
+
+        self.test_get_contest()
