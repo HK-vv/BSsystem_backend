@@ -131,18 +131,20 @@ def batch_add(request, data):
 def batch_public(request, data):
     problems = data['problems']
     user = request.user
-    already = []
-    with transaction.atomic():
-        for problemid in problems:
-            problem = Problem.objects.get(id=problemid)
-            if problem.authorid != user and not user.is_superuser:
-                return msg_response(1, msg='权限不足')
-            if problem.public:
-                already.append(problemid)
-            else:
-                problem.public = True
-                problem.save()
-        return ret_response(0, {'already': already})
+    try:
+        with transaction.atomic():
+            for problemid in problems:
+                problem = Problem.objects.get(id=problemid)
+                if problem.authorid != user and not user.is_superuser:
+                    return msg_response(1, msg='权限不足')
+                else:
+                    problem.public = True
+                    problem.save()
+    except Exception as e:
+        traceback.print_exc()
+        print(e.args)
+        return msg_response(1, f'题目{problemid}不存在')
+    return ret_response(0)
 
 
 def problem_dispatcher(request):
@@ -286,10 +288,14 @@ def add_problem(request, data):
 @require_admin_login
 def del_problem(request, data):
     problems = data['problems']
+    user = request.user
     try:
         with transaction.atomic():
             for id in problems:
-                Problem.objects.get(id=id).delete()
+                problem = Problem.objects.get(id=id)
+                if problem.authorid != user and not user.is_superuser:
+                    return msg_response(1, f'题目{id}不是您创建的题目')
+                problem.delete()
     except Exception as e:
         traceback.print_exc()
         print(e.args)

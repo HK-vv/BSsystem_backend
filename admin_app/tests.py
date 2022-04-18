@@ -80,7 +80,7 @@ class Test(TestCase):
     def test_del_problem(self):
         self.login()
         payload = {
-          "problems": list(range(85,110))
+          "problems": list(range(80,85))
         }
         response = requests.put(f'http://{self.localhost}:{self.port}/api/admin/problem/batch/delete',
                                 cookies=self.cookie, json=payload)
