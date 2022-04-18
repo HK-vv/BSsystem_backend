@@ -101,6 +101,7 @@ def reset_password(request, data):
     if user is None:
         return msg_response(1, "用户名不存在")
     user.set_password(BSAdmin.DEFAULT_PASSWORD)
+    user.save()
     return msg_response(0)
 
 

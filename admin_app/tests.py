@@ -17,7 +17,7 @@ class Test(TestCase):
 
         payload = {
             'username': 'eddie',
-            'password': '111111'
+            'password': '123456'
         }
 
         # resp = client.post(url, data=payload,
@@ -97,6 +97,15 @@ class Test(TestCase):
             }
         }
         response = requests.post(f'http://{self.localhost}:{self.port}/api/admin/admin_account',
+                                 cookies=self.cookie, json=payload)
+        pprint.pprint(response.json())
+
+    def test_reset(self):
+        self.login()
+        payload = {
+            "username": "eddie"
+        }
+        response = requests.post(f'http://{self.localhost}:{self.port}/api/admin/admin_account/reset_password',
                                  cookies=self.cookie, json=payload)
         pprint.pprint(response.json())
 
