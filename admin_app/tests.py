@@ -16,8 +16,8 @@ class Test(TestCase):
         # client = Client()
 
         payload = {
-            'username': 'super',
-            'password': '123456'
+            'username': 'eddie',
+            'password': '111111'
         }
 
         # resp = client.post(url, data=payload,
@@ -80,10 +80,24 @@ class Test(TestCase):
     def test_del_problem(self):
         self.login()
         payload = {
-          "problems": list(range(80,85))
+            "problems": list(range(80, 85))
         }
         response = requests.put(f'http://{self.localhost}:{self.port}/api/admin/problem/batch/delete',
                                 cookies=self.cookie, json=payload)
+        pprint.pprint(response.json())
+
+    def test_modify_account(self):
+        self.login()
+        payload = {
+            "newdata": {
+                "username": "eddie",
+                "password": "111111",
+                "email": "19182605@buaa.edu.cn",
+                "phone": "18800000001"
+            }
+        }
+        response = requests.post(f'http://{self.localhost}:{self.port}/api/admin/admin_account',
+                                 cookies=self.cookie, json=payload)
         pprint.pprint(response.json())
 
     # def test_batch_add(self):

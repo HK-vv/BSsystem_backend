@@ -52,9 +52,9 @@ def modify_account(request, data):
         if nd.get('password'):
             user.set_password(nd.get('password'))
         if nd.get('email'):
-            user.username = nd.get('email')
+            user.email = nd.get('email')
         if nd.get('phone'):
-            user.username = nd.get('phone')
+            user.phone = nd.get('phone')
         user.save()
     except DatabaseError:
         return msg_response(1, "用户名已存在")
