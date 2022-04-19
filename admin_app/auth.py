@@ -25,9 +25,8 @@ def log_in(request, data):
 @require_admin_login
 def log_out(request, data):
     if request.user.is_authenticated:
+        if OUTPUT_LOG:
+            print(f"{request.user.username} 下线了！")
         logout(request)
-
-    if OUTPUT_LOG:
-        print(f"{request.user.username} 下线了！")
 
     return msg_response(0)
