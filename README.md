@@ -2,7 +2,7 @@
 
 主仓库: https://github.com/HK-vv/SE-BSsystem
 
-
+镜像仓库: https://gitee.com/hkvv/BSsystem_backend_mirror
 
 ### 使用说明书
 
