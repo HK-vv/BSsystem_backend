@@ -1,5 +1,7 @@
 from django.core.paginator import Paginator
 from django.db import transaction, DatabaseError
+
+from brainstorm.settings import OUTPUT_LOG
 from utils.decorators import *
 from brainstorm import settings
 import os
@@ -109,7 +111,8 @@ def batch_add(request, data):
         return msg_response(1, msg='文件格式有误')
 
     table = table.where(table.notnull(), None)
-    # print(table)
+    print(table)
+
     try:
         problems = excel2problems(table, user)
     except Exception as e:
@@ -123,6 +126,9 @@ def batch_add(request, data):
         for problem in problems:
             ProblemTag.objects.create(problemid=problem,
                                       tagid_id=id)
+
+    if OUTPUT_LOG:
+        print(f"{user.username} 批量添加了题目")
 
     return msg_response(0)
 
@@ -144,6 +150,10 @@ def batch_public(request, data):
         traceback.print_exc()
         print(e.args)
         return msg_response(1, f'题目{problemid}不存在')
+
+    if OUTPUT_LOG:
+        print(f"{user.username} 批量公开了题目 {str(problems)}")
+
     return ret_response(0)
 
 
@@ -252,6 +262,10 @@ def modify_problem(request, data):
             ProblemTag.objects.create(problemid=prob, tagid=tag).save()
     except DatabaseError:
         return msg_response(1, "修改失败")
+
+    if OUTPUT_LOG:
+        print(f"{user.username} 修改了题目 {id}")
+
     return msg_response(0)
 
 
@@ -277,12 +291,16 @@ def add_problem(request, data):
         for id in tagsid:
             ProblemTag.objects.create(problemid=problem,
                                       tagid_id=id)
-        return msg_response(0)
 
     except Exception as e:
         traceback.print_exc()
         print(e.args)
         return msg_response(1, '题目格式有误')
+
+    if OUTPUT_LOG:
+        print(f"{user.username} 添加了题目 {problem.id}")
+
+    return msg_response(0)
 
 
 @require_admin_login
@@ -300,4 +318,8 @@ def del_problem(request, data):
         traceback.print_exc()
         print(e.args)
         return msg_response(1, f'题目{id}不存在')
+
+    if OUTPUT_LOG:
+        print(f"{user.username} 删除了题目 {str(problems)}")
+
     return msg_response(0)

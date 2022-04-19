@@ -3,7 +3,7 @@ from django.core.paginator import Paginator
 from django.db import DatabaseError
 from django.db.models.functions import Lower
 from django.http import JsonResponse
-
+from brainstorm.settings import OUTPUT_LOG
 from bsmodels.models import BSAdmin
 from utils.auxilary import msg_response, ret_response
 from utils.decorators import require_admin_login, require_super_login
@@ -35,6 +35,8 @@ def create_account(request, data):
         nu.save()
     except DatabaseError:
         return msg_response(1, "用户名已存在")
+    if OUTPUT_LOG:
+        print(f"{request.user.username} 创建了账号 {data['username']}")
     return msg_response(0)
 
 
@@ -63,12 +65,16 @@ def modify_account(request, data):
         user.save()
     except DatabaseError:
         return msg_response(1, "用户名已存在")
+    if OUTPUT_LOG:
+        print(f"{user.username} 修改了个人信息")
     return msg_response(0)
 
 
 @require_super_login
 def delete_account(request, data):
     BSAdmin.objects.get(username=data['username']).delete()
+    if OUTPUT_LOG:
+        print(f"{request.user.username} 删除了 {data['username']} 的账号")
     return msg_response(0)
 
 
@@ -107,6 +113,8 @@ def reset_password(request, data):
         return msg_response(1, "用户名不存在")
     user.set_password(BSAdmin.DEFAULT_PASSWORD)
     user.save()
+    if OUTPUT_LOG:
+        print(f"{request.user.username} 重置了 {user.username} 的密码")
     return msg_response(0)
 
 

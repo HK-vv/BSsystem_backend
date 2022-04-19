@@ -1,3 +1,4 @@
+from brainstorm.settings import OUTPUT_LOG
 from utils.auxilary import *
 from utils.handler import *
 from bsmodels.models import BSUser
@@ -30,6 +31,10 @@ def modify_profile(request, data):
         if 'username' in newdata:
             user.username = newdata['username']
         user.save()
+
+        if OUTPUT_LOG:
+            print(f"{request.user.username} 修改了个人信息")
+
         return msg_response(0)
 
     except BSUser.DoesNotExist:

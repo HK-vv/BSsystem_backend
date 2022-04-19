@@ -1,7 +1,7 @@
 import string
 import requests
 import random
-from brainstorm.settings import APPID
+from brainstorm.settings import APPID, OUTPUT_LOG
 from brainstorm.settings import SECRET
 from utils.decorators import *
 from utils.auxilary import *
@@ -40,11 +40,13 @@ def login(request, data):
 
         BSUser.objects.create(openid=openid,
                               username=username)
-        print(username + " 用户成功注册")
+        if OUTPUT_LOG:
+            print(f"{username} 用户成功注册")
     else:
         username = user[0].username
 
-    print(username + " 用户已登录")
+    if OUTPUT_LOG:
+        print(f"{username} 用户上线了！")
 
     # 设置session
     request.session['openid'] = openid
@@ -59,7 +61,8 @@ def logout(request, data):
     # 使用登出方法
     openid = request.session['openid']
     username = BSUser.objects.get(openid=openid).username
-    print(username + " 用户已登出")
+    if OUTPUT_LOG:
+        print(f"{username} 用户已登出")
     del request.session['openid']
     del request.session['session_key']
     return JsonResponse({'ret': 0})

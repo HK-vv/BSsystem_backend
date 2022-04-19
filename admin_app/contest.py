@@ -1,6 +1,8 @@
 from datetime import *
 import random
 from django.db import transaction, IntegrityError
+
+from brainstorm.settings import OUTPUT_LOG
 from bsmodels.models import Contest, Problem, ContestProblem
 from utils.auxilary import ret_response
 from utils.decorators import *
@@ -121,6 +123,10 @@ def modify_contest(request, data):
             no = no + 1
     except Exception as e:
         return msg_response(1, e.args)
+
+    if OUTPUT_LOG:
+        print(f"{user.username} 修改了比赛 {contestid}")
+
     return msg_response(0)
 
 
@@ -160,6 +166,9 @@ def add_contest(request, data):
         print(e.args)
         return msg_response(1, e.args)
 
+    if OUTPUT_LOG:
+        print(f"{user.username} 创建了比赛 {contest.id}")
+
     return msg_response(0)
 
 
@@ -178,4 +187,8 @@ def del_contest(request, data):
         traceback.print_exc()
         print(e.args)
         return msg_response(1, f'比赛{id}不存在')
+
+    if OUTPUT_LOG:
+        print(f"{user.username} 删除了比赛 {str(contests)}")
+    
     return msg_response(0)
