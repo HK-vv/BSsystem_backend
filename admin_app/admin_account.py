@@ -21,6 +21,11 @@ def root_dispatcher(request):
 
 
 @require_super_login
+def get_username(request, data):
+    return ret_response(0, {'username': request.user.username})
+
+
+@require_super_login
 def create_account(request, data):
     try:
         BSAdmin.objects.create_user(username=data['username'],

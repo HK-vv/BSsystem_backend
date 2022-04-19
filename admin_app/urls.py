@@ -5,6 +5,7 @@ urlpatterns = [
     path('auth/login', auth.log_in),
     path('auth/logout', auth.log_out),
     path('admin_account', admin_account.root_dispatcher),
+    path('admin_account/get_username', admin_account.get_username),
     path('admin_account/list', admin_account.account_list),
     path('admin_account/issuper', admin_account.is_super),
     path('admin_account/reset_password', admin_account.reset_password),
