@@ -20,7 +20,7 @@ def root_dispatcher(request):
     return dispatcher_base(request, method2handler)
 
 
-@require_super_login
+@require_admin_login
 def get_username(request, data):
     return ret_response(0, {'username': request.user.username})
 
