@@ -80,7 +80,7 @@ def get_problem(request, data):
 @require_user_login
 def check(request, data):
     problem_id = data['problem_id']
-    ur_answer = data['answer']
+    ur_answer = data['user_answer']
 
     try:
         problem = Problem.objects.get(id=problem_id)
