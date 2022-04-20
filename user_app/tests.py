@@ -54,6 +54,21 @@ class Test(TestCase):
                                 cookies=self.cookie)
         pprint.pprint(response.json())
 
+    def test_register(self):
+        self.test_login()
+        payload = {
+            "contestid": 7
+        }
+        response = requests.post(f'http://{self.localhost}:{self.port}/api/user/contest/register',
+                                 cookies=self.cookie, json=payload)
+        pprint.pprint(response.json())
+
+    def test_records(self):
+        self.test_login()
+        response = requests.get(f'http://{self.localhost}:{self.port}/api/user/contest/records?pagesize=1&pagenum=1',
+                                cookies=self.cookie)
+        pprint.pprint(response.json())
+
 
 if __name__ == '__main__':
     t = Test()
@@ -62,5 +77,5 @@ if __name__ == '__main__':
     # t.test_get_info()
     # t.test_collect('语文', 4)
     # t.test_get_problem(3)
-    t.test_check(1, 'A')
+    t.test_register()
     t.test_logout()
