@@ -1,5 +1,6 @@
 from django.core.paginator import Paginator
 from django.db import transaction, DatabaseError
+from django.forms import model_to_dict
 
 from brainstorm.settings import OUTPUT_LOG
 from utils.decorators import *
@@ -329,7 +330,7 @@ def del_problem(request, data):
 def problem_detail(request, data):
     problemid = data['problemid']
     try:
-        problem = Problem.objects.get(id=problemid)
+        problem = model_to_dict(Problem.objects.get(id=problemid))
         info = {'problemid': problemid,
                 'type': problem['type'],
                 'description': problem['description'],
@@ -346,7 +347,7 @@ def problem_detail(request, data):
                 options.append(problem[chr(ord('A') + i)])
         info['options'] = options
 
-        authorid = problem['authorid_id']
+        authorid = problem['authorid']
         author = BSAdmin.objects.get(id=authorid).username
         info['author'] = author
 
