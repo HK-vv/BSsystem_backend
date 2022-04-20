@@ -14,6 +14,7 @@ urlpatterns = [
     path('user_account/contest/history', user_account.user_contest_history),
     path('tag', tag.tag_dispatcher),
     path('problem', problem.problem_dispatcher),
+    path('problem/detail', problem.problem_detail),
     path('problem/batch/add', problem.batch_add),
     path('problem/batch/public', problem.batch_public),
     path('problem/batch/delete', problem.del_problem),

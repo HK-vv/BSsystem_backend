@@ -323,3 +323,36 @@ def del_problem(request, data):
         print(f"{user.username} 删除了题目 {str(problems)}")
 
     return msg_response(0)
+
+
+@require_admin_login
+def problem_detail(request, data):
+    problemid = data['problemid']
+    try:
+        problem = Problem.objects.get(id=problemid)
+        info = {'problemid': problemid,
+                'type': problem['type'],
+                'description': problem['description'],
+                'answer': problem['answer'],
+                'public': problem['public']}
+
+        tagsid = list(ProblemTag.objects.filter(problemid_id=problemid).values_list('tagid', flat=True))
+        tags = list(Tag.objects.filter(id__in=tagsid).values_list('name', flat=True))
+        info['tags'] = tags
+
+        options = []
+        for i in range(4):
+            if problem[chr(ord('A') + i)] is not None:
+                options.append(problem[chr(ord('A') + i)])
+        info['options'] = options
+
+        authorid = problem['authorid_id']
+        author = BSAdmin.objects.get(id=authorid).username
+        info['author'] = author
+
+    except Exception as e:
+        traceback.print_exc()
+        print(e.args)
+        return msg_response(1, f'题目{problemid}不存在')
+
+    return ret_response(0, {'info': info})
