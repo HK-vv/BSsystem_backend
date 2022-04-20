@@ -7,7 +7,7 @@ from utils.decorators import *
 from utils.auxilary import *
 from bsmodels.models import BSUser
 
-DEBUG = True
+DEBUG = False
 
 
 # 登陆
