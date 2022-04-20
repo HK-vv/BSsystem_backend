@@ -173,7 +173,7 @@ class Test(TestCase):
     def test_list_contest(self):
         self.login()
         response = requests.get(f'http://{self.localhost}:{self.port}/api/general/contest/list?pagesize=5'
-                                f'&pagenum=1',
+                                f'&pagenum=1&type=in_progress',
                                 cookies=self.cookie)
         pprint.pprint(response.json())
 

@@ -26,17 +26,9 @@ def contest_list(request, data):
         elif type == 'history':
             lst = lst.filter(announced=True)
         elif type == 'in_progress':
-            satisfy = []
-            for contest in lst:
-                if contest.end > cur >= contest.start:
-                    satisfy.append(contest.id)
-            lst = lst.filter(id__in=satisfy)
+            lst = lst.filter(Q(end__gt=cur) & Q(start__lte=cur))
         elif type == 'to_be_announced':
-            satisfy = []
-            for contest in lst:
-                if cur >= contest.end and not contest.announced:
-                    satisfy.append(contest.id)
-            lst = lst.filter(id__in=satisfy)
+            lst = lst.filter(Q(end__lte=cur) & Q(announced=False))
 
     if data.get('keyword'):
         keyword = data['keyword']
@@ -81,6 +73,9 @@ def contest_list(request, data):
                 item['time_limited'][problem.type] = it['duration']
 
         item['register_num'] = Registration.objects.filter(contestid=contestid).count()
+
+        if contest.end is None:
+            contest.end = contest.get_end_time()
 
         if cur < contest.start:
             item['status'] = '未开始'
