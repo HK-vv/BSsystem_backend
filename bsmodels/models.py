@@ -113,7 +113,7 @@ class Contest(models.Model):
     start = models.DateTimeField()
     latest = models.DateTimeField()
     end = models.DateTimeField()
-    password = models.CharField(max_length=30, null=True, blank=True)
+    password = models.CharField(max_length=30, null=True)
     rated = models.BooleanField()
     announced = models.BooleanField(default=False)
     authorid = models.ForeignKey(BSAdmin, on_delete=models.SET_NULL, blank=True, null=True)

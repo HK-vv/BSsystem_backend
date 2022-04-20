@@ -34,3 +34,16 @@ def session_expired(request, keyword):
         return True
     else:
         return False
+
+
+# Here's an example of applying this function in serialization
+# Let ori=[{'mydata':1},{'mydata':2},{'mydata':345}],
+# and mp={'mydata': "my_data"}
+# Then we return this: [{'my_data':1},{'my_data':2},{'my_data':345}]
+#
+# Notice: It would lead to UB if `mp` is overlap.
+def dict_list_decorator(ori: list, mp: dict) -> list:
+    for x in ori:
+        for a, b in mp:
+            x[b] = x.pop(a)
+    return ori
