@@ -66,7 +66,7 @@ class Problem(models.Model):
     def __completion_check(self, answer, ur_answer):
         # 删除空格、分隔答案
         ans_temp = answer.replace(" ", "").split(',')
-        ur_ans = ur_answer.replace(" ", "").split(',')
+        ur_ans = ur_answer.replace(" ", "").replace("，", ",").split(',')
 
         # 删除空白项
         while '' in ans_temp:
@@ -88,7 +88,6 @@ class Problem(models.Model):
             ans_word = ans[i]
             # 答案不在答题者答案中则错
             if ur_word not in ans_word:
-                print(ur_word, ans_word)
                 return 0
         return 1
 
