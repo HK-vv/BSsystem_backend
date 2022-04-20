@@ -1,5 +1,7 @@
+from datetime import *
 import json
 
+import pytz
 from django.test import TestCase, Client
 import pprint
 import requests
@@ -112,9 +114,9 @@ class Test(TestCase):
     def test_add_contest(self):
         self.login()
         payload = {
-            "name": "test",
-            "start": "2022-04-19 22:35:00",
-            "latest": "2022-04-30 22:45:00",
+            "name": "test2029",
+            "start": "2022-04-20 19:00:00",
+            "latest": "2021-04-20 19:10:00",
             "password": "brainstorm",
             "rated": True,
             "time_limited": {
@@ -128,6 +130,8 @@ class Test(TestCase):
             ],
             "ordered": False
         }
+        time = pytz.UTC.localize(datetime.strptime('2022-04-19 22:35:00', '%Y-%m-%d %H:%M:%S'))
+
         response = requests.put(f'http://{self.localhost}:{self.port}/api/admin/contest',
                                 cookies=self.cookie, json=payload)
         pprint.pprint(response.json())
@@ -141,7 +145,7 @@ class Test(TestCase):
     def test_modify_contest(self):
         self.login()
         payload = {
-            "contestid": 2,
+            "contestid": 4,
             "newdata": {
                 "name": "April Fools Day Contest 2023",
                 "start": "2022-04-01 22:35:00",
@@ -161,7 +165,7 @@ class Test(TestCase):
             }
         }
         response = requests.post(f'http://{self.localhost}:{self.port}/api/admin/contest',
-                                cookies=self.cookie, json=payload)
+                                 cookies=self.cookie, json=payload)
         pprint.pprint(response.json())
 
         self.test_get_contest()
@@ -169,7 +173,7 @@ class Test(TestCase):
     def test_list_contest(self):
         self.login()
         response = requests.get(f'http://{self.localhost}:{self.port}/api/general/contest/list?pagesize=5'
-                                f'&pagenum=1&type=upcoming',
+                                f'&pagenum=1',
                                 cookies=self.cookie)
         pprint.pprint(response.json())
 

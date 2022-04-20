@@ -107,7 +107,7 @@ def records(request, data):
 
         if cur < contest.start:
             item['status'] = '未开始'
-        elif cur < contest.get_end_time():
+        elif cur < contest.end:
             item['status'] = '比赛中'
         elif contest.announced:
             item['status'] = '已结束'

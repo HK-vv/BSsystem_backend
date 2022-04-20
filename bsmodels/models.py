@@ -112,7 +112,7 @@ class Contest(models.Model):
     name = models.CharField(max_length=30, unique=True)
     start = models.DateTimeField()
     latest = models.DateTimeField()
-    end = models.DateTimeField()
+    end = models.DateTimeField(null=True)
     password = models.CharField(max_length=30, null=True)
     rated = models.BooleanField()
     announced = models.BooleanField(default=False)

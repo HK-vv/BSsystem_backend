@@ -57,7 +57,8 @@ class Test(TestCase):
     def test_register(self):
         self.test_login()
         payload = {
-            "contestid": 7
+            "contestid": 6,
+            'password': 'brainstorm'
         }
         response = requests.post(f'http://{self.localhost}:{self.port}/api/user/contest/register',
                                  cookies=self.cookie, json=payload)
@@ -65,7 +66,7 @@ class Test(TestCase):
 
     def test_records(self):
         self.test_login()
-        response = requests.get(f'http://{self.localhost}:{self.port}/api/user/contest/records?pagesize=1&pagenum=1',
+        response = requests.get(f'http://{self.localhost}:{self.port}/api/user/contest/records?pagesize=4&pagenum=1',
                                 cookies=self.cookie)
         pprint.pprint(response.json())
 

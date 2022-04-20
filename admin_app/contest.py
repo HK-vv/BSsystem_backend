@@ -1,5 +1,7 @@
 from datetime import *
 import random
+
+import pytz
 from django.db import transaction, IntegrityError
 
 from brainstorm.settings import OUTPUT_LOG
@@ -12,8 +14,8 @@ from utils.handler import dispatcher_base
 def data2contest(data, user):
     name = data['name']
     try:
-        start = datetime.strptime(data['start'], '%Y-%m-%d %H:%M:%S')
-        latest = datetime.strptime(data['latest'], '%Y-%m-%d %H:%M:%S')
+        start = pytz.UTC.localize(datetime.strptime(data['start'], '%Y-%m-%d %H:%M:%S'))
+        latest = pytz.UTC.localize(datetime.strptime(data['latest'], '%Y-%m-%d %H:%M:%S'))
     except Exception as e:
         raise Exception('时间格式错误')
 
@@ -139,7 +141,12 @@ def modify_contest(request, data):
 @require_admin_login
 def add_contest(request, data):
     user = request.user
-    contest = data2contest(data, user)
+    try:
+        contest = data2contest(data, user)
+    except Exception as e:
+        traceback.print_exc()
+        print(e.args)
+        return msg_response(1, e.args)
 
     problems = data['problems']
     _time = data['time_limited']
