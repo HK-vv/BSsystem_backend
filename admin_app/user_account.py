@@ -1,7 +1,7 @@
 from django.core.paginator import Paginator
 from django.db.models import Count
 
-from bsmodels.models import BSUser
+from bsmodels.models import BSUser, Contest, Registration
 from utils.auxilary import ret_response
 from utils.decorators import require_admin_login
 
@@ -22,8 +22,7 @@ def user_list(request, data):
         lst = lst.order_by('rating')
 
     tot = lst.count()
-    paginator = Paginator(lst, ps)
-    page = paginator.page(pn)
+    page = Paginator(lst, ps).page(pn)
     items = page.object_list.values('username', 'rating', matches=Count('registration'))
     items = list(items)
 
@@ -32,4 +31,22 @@ def user_list(request, data):
 
 @require_admin_login
 def user_contest_history(request, data):
-    pass
+    ps = int(data['pagesize'])
+    pn = int(data['pagenum'])
+    username = data['username']
+    kw = data.get('keyword')
+
+    lst = Registration.objects.filter(userid__username=username)
+    tot = lst.count()
+    page = Paginator(lst, ps).page(pn)
+    items = page.object_list.values('contestid',
+                                    'contestid__name',
+                                    'contestid__rated',
+                                    'score',
+                                    'beforerating',
+                                    'afterrating',
+                                    'timecost',
+                                    'rank')
+    items = list(items)
+    # TODO: change keys yet to finish... working on auxiliary
+    return ret_response(0, {'items': items, 'total': tot})
