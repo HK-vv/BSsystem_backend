@@ -17,6 +17,9 @@ def data2contest(data, user):
     except Exception as e:
         raise Exception('时间格式错误')
 
+    if start > latest:
+        raise Exception('比赛开始时间不能晚于最晚进入时间')
+
     password = data.get('password') if data.get('password') else None
     rated = data['rated']
 
@@ -190,5 +193,5 @@ def del_contest(request, data):
 
     if OUTPUT_LOG:
         print(f"{user.username} 删除了比赛 {str(contests)}")
-    
+
     return msg_response(0)

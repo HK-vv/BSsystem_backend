@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -112,8 +114,17 @@ class Contest(models.Model):
     latest = models.DateTimeField()
     password = models.CharField(max_length=30, null=True)
     rated = models.BooleanField()
+    done = models.BooleanField(default=False)
     authorid = models.ForeignKey(BSAdmin, on_delete=models.SET_NULL, blank=True, null=True)
     # problems = models.ManyToManyField(Problem, through=ContestProblem)
+
+    def get_end_time(self):
+        problems = ContestProblem.objects.filter(contestid=self.id)
+        max_time = 0
+        for problem in problems:
+            max_time += problem.duration
+
+        return self.latest + datetime.timedelta(seconds=max_time)
 
 
 class ContestProblem(models.Model):

@@ -20,6 +20,7 @@ pip install django
 pip install requests
 pip install pandas
 pip install openpyxl
+pip install pytz
 
 # 建立本地数据库
 ## 每次pull之后都要运行本段代码

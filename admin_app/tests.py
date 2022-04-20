@@ -112,9 +112,9 @@ class Test(TestCase):
     def test_add_contest(self):
         self.login()
         payload = {
-            "name": "April Fools Day Contest 2023",
-            "start": "2022-04-01 22:35:00",
-            "latest": "2022-04-01 22:45:00",
+            "name": "test",
+            "start": "2022-04-19 22:35:00",
+            "latest": "2022-04-30 22:45:00",
             "password": "brainstorm",
             "rated": True,
             "time_limited": {
@@ -124,7 +124,7 @@ class Test(TestCase):
                 "completion": 60
             },
             "problems": [
-                50, 51, 52, 53, 54, 55, 56, 57
+                1,15,32,55,42,60
             ],
             "ordered": False
         }
@@ -144,7 +144,7 @@ class Test(TestCase):
             "contestid": 2,
             "newdata": {
                 "name": "April Fools Day Contest 2023",
-                "start": "2023-04-01 22:35:00",
+                "start": "2022-04-01 22:35:00",
                 "latest": "2024-04-01 22:45:00",
                 "password": "brainstorm",
                 "rated": True,
@@ -165,3 +165,16 @@ class Test(TestCase):
         pprint.pprint(response.json())
 
         self.test_get_contest()
+
+    def test_list_contest(self):
+        self.login()
+        response = requests.get(f'http://{self.localhost}:{self.port}/api/general/contest/list?pagesize=5'
+                                f'&pagenum=1&type=upcoming',
+                                cookies=self.cookie)
+        pprint.pprint(response.json())
+
+    def test_problem(self):
+        self.login()
+        response = requests.get(f'http://{self.localhost}:{self.port}/api/admin/problem/detail?problemid=225',
+                                cookies=self.cookie)
+        pprint.pprint(response.json())
