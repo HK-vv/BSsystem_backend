@@ -3,7 +3,7 @@ from django.db.models import Q
 from brainstorm.settings import OUTPUT_LOG
 from utils.auxilary import *
 from utils.decorators import *
-from bsmodels.models import Tag
+from bsmodels.models import Tag, BSUser
 from bsmodels.models import ProblemTag
 import random
 
@@ -37,7 +37,8 @@ def collect_problem(request, data):
         problems = random.sample(problemsid, total)
 
         if OUTPUT_LOG:
-            print(f"{request.user.username} 开始了练习")
+            user = BSUser.objects.get(openid=request.session['openid'])
+            print(f"{user.username} 开始了练习")
 
         return JsonResponse({'ret': 0,
                              'problems': problems,
@@ -71,7 +72,8 @@ def get_problem(request, data):
             options = []
 
         if OUTPUT_LOG:
-            print(f"{request.user.username} 正在练习第 {id} 题")
+            user = BSUser.objects.get(openid=request.session['openid'])
+            print(f"{user.username} 正在练习第 {id} 题")
 
         return JsonResponse({'ret': 0,
                              'type': type,

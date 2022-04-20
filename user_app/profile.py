@@ -33,7 +33,7 @@ def modify_profile(request, data):
         user.save()
 
         if OUTPUT_LOG:
-            print(f"{request.user.username} 修改了个人信息")
+            print(f"{user.username} 修改了个人信息")
 
         return msg_response(0)
 
