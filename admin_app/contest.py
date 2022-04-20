@@ -125,6 +125,8 @@ def modify_contest(request, data):
                                           duration=_time[problem.type],
                                           number=no)
             no = no + 1
+        nt.end = nt.get_end_time()
+        nt.save()
     except Exception as e:
         return msg_response(1, e.args)
 
@@ -161,6 +163,8 @@ def add_contest(request, data):
                                               duration=_time[problem.type],
                                               number=no)
                 no = no + 1
+            contest.end = contest.get_end_time()
+            contest.save()
     except IntegrityError as ie:
         traceback.print_exc()
         print(ie.args)
