@@ -74,19 +74,12 @@ def contest_list(request, data):
         contest_problem = ContestProblem.objects.filter(contestid=contest).order_by('number')
         problems = list(contest_problem.values('problemid', 'duration'))
 
-        problemsid = []
-
-        max_time = 0
-
         for it in problems:
             problemid = it['problemid']
             if Problem.objects.get(id=problemid):
                 problem = Problem.objects.get(id=problemid)
                 item['time_limited'][problem.type] = it['duration']
-                max_time += it['duration']
-            problemsid.append(problemid)
 
-        item['problems'] = problemsid
         item['register_num'] = Registration.objects.filter(contestid=contestid).count()
 
         if cur < contest.start:
