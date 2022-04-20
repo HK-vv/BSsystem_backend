@@ -20,7 +20,8 @@ def data2contest(data, user):
     if start > latest:
         raise Exception('比赛开始时间不能晚于最晚进入时间')
 
-    password = data.get('password') if data.get('password') else None
+    password = data.get('password')
+    password = None if password == "" else password
     rated = data['rated']
 
     contest = Contest(name=name,
