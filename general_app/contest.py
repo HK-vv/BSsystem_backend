@@ -89,7 +89,6 @@ def contest_list(request, data):
         item['problems'] = problemsid
         item['register_num'] = Registration.objects.filter(contestid=contestid).count()
 
-        print(cur, contest.start, contest.get_end_time())
         if cur < contest.start:
             item['status'] = '未开始'
         elif cur < contest.get_end_time():
