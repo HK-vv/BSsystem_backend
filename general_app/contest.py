@@ -24,7 +24,7 @@ def contest_list(request, data):
         if type == 'upcoming':
             lst = lst.filter(start__gt=cur)
         elif type == 'history':
-            lst = lst.filter(done=True)
+            lst = lst.filter(announced=True)
         elif type == 'in_progress':
             satisfy = []
             for contest in lst:
@@ -34,7 +34,7 @@ def contest_list(request, data):
         elif type == 'to_be_announced':
             satisfy = []
             for contest in lst:
-                if cur >= contest.get_end_time() and not contest.done:
+                if cur >= contest.get_end_time() and not contest.announced:
                     satisfy.append(contest.id)
             lst = lst.filter(id__in=satisfy)
 
@@ -86,7 +86,7 @@ def contest_list(request, data):
             item['status'] = '未开始'
         elif cur < contest.get_end_time():
             item['status'] = '比赛中'
-        elif contest.done:
+        elif contest.announced:
             item['status'] = '已结束'
         else:
             item['status'] = '待公布成绩'

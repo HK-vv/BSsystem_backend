@@ -49,15 +49,17 @@
 
 ### Contest
 
-| 列名     | 数据类型及精度 | 约束条件                    | 说明         | 备注               |
-| -------- | -------------- | --------------------------- | ------------ | ------------------ |
-| id       | int            | PRIMARY KEY, AUTO_INCREMENT | 唯一标识     |                    |
-| name     | varchar(30)    | NOT NULL, UNIQUE            | 竞赛名称     |                    |
-| start    | datetime       | NOT NULL                    | 竞赛开始时间 |                    |
-| latest   | datetime       | NOT NULL                    | 最晚进入时间 |                    |
-| password | varchar(30)    |                             | 比赛密码     | 为NULL代表比赛公开 |
-| rated    | boolean        | NOT NULL                    | 是否计分     |                    |
-| authorid | int            | FOREIGN KEY(Admin(id))      | 作者id       |                    |
+| 列名      | 数据类型及精度 | 约束条件                    | 说明             | 备注               |
+| --------- | -------------- | --------------------------- | ---------------- | ------------------ |
+| id        | int            | PRIMARY KEY, AUTO_INCREMENT | 唯一标识         |                    |
+| name      | varchar(30)    | NOT NULL, UNIQUE            | 竞赛名称         |                    |
+| start     | datetime       | NOT NULL                    | 竞赛开始时间     |                    |
+| latest    | datetime       | NOT NULL                    | 最晚进入时间     |                    |
+| end       | date           | NOT NULL                    | 结束时间         |                    |
+| announced | boolean        | DEFAULT(false)              | 是否已经公布成绩 |                    |
+| password  | varchar(30)    |                             | 比赛密码         | 为NULL代表比赛公开 |
+| rated     | boolean        | NOT NULL                    | 是否计分         |                    |
+| authorid  | int            | FOREIGN KEY(Admin(id))      | 作者id           |                    |
 
 ### ContestProblem
 

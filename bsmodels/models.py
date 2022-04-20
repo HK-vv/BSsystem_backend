@@ -112,9 +112,10 @@ class Contest(models.Model):
     name = models.CharField(max_length=30, unique=True)
     start = models.DateTimeField()
     latest = models.DateTimeField()
+    end = models.DateTimeField()
     password = models.CharField(max_length=30, null=True, blank=True)
     rated = models.BooleanField()
-    done = models.BooleanField(default=False)
+    announced = models.BooleanField(default=False)
     authorid = models.ForeignKey(BSAdmin, on_delete=models.SET_NULL, blank=True, null=True)
     # problems = models.ManyToManyField(Problem, through=ContestProblem)
 
