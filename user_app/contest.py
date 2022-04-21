@@ -2,6 +2,7 @@ import datetime
 import traceback
 import pytz
 from django.core.paginator import Paginator
+from django.db import transaction
 
 from bsmodels.models import Contest, BSUser, Registration, ContestProblem, Problem
 from utils.auxilary import msg_response, ret_response
@@ -139,10 +140,12 @@ def start(request, data):
         return msg_response(1, msg=f'比赛{contestid}已结束')
 
     try:
-        reg = Registration.objects.get(userid=user, contestid=contest)
-        if reg.starttime is None:
-            reg.starttime = cur
-            reg.save()
+        with transaction.atomic():
+            reg = Registration.objects.get(userid=user, contestid=contest)
+            if reg.starttime is None:
+                reg.starttime = cur
+                reg.currenttime = cur
+                reg.save()
 
         # 计算比赛题目总共数量
         total = ContestProblem.objects.filter(contestid=contest).count()

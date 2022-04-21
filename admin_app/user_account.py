@@ -20,6 +20,8 @@ def user_list(request, data):
         lst = lst.order_by('-rating')
     elif st == 'ascending':
         lst = lst.order_by('rating')
+    else:
+        lst = lst.order_by('openid')
 
     tot = lst.count()
     page = Paginator(lst, ps).page(pn)
