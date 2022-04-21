@@ -18,7 +18,7 @@ class Test(TestCase):
         # client = Client()
 
         payload = {
-            'username': 'eddie',
+            'username': 'super',
             'password': '123456'
         }
 
@@ -82,7 +82,7 @@ class Test(TestCase):
     def test_del_problem(self):
         self.login()
         payload = {
-            "problems": list(range(80, 85))
+            "problems": list(range(100, 105))
         }
         response = requests.put(f'http://{self.localhost}:{self.port}/api/admin/problem/batch/delete',
                                 cookies=self.cookie, json=payload)
