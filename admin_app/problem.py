@@ -197,6 +197,7 @@ def get_problem(request, data):
         keyword = data['keyword']
         lst = lst.filter(description__icontains=keyword)
 
+    lst = lst.order_by('id')
     total = lst.count()
     paginator = Paginator(lst, pagesize)
     page = paginator.page(pagenum)
