@@ -77,7 +77,9 @@ def excel2problems(table, user):
                 problems.append(problem)
             return problems
 
-    except Exception:
+    except Exception as e:
+        traceback.print_exc()
+        print(e.args)
         raise Exception(f"第{i + 2}行格式错误")
 
 
@@ -108,7 +110,9 @@ def batch_add(request, data):
         table.replace({"public": {'公开': True, '不公开': False}}, inplace=True)
         table.replace({"type": {'单选题': 'single', '多选题': 'multiple',
                                 '判断题': 'binary', '填空题': 'completion'}}, inplace=True)
-    except Exception:
+    except Exception as e:
+        traceback.print_exc()
+        print(e.args)
         return msg_response(1, msg='文件格式有误')
 
     table = table.where(table.notnull(), None)
