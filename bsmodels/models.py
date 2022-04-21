@@ -116,6 +116,7 @@ class Contest(models.Model):
     password = models.CharField(max_length=30, null=True)
     rated = models.BooleanField()
     announced = models.BooleanField(default=False)
+    ordered = models.BooleanField(default=False)
     authorid = models.ForeignKey(BSAdmin, on_delete=models.SET_NULL, blank=True, null=True)
     # problems = models.ManyToManyField(Problem, through=ContestProblem)
 

@@ -117,3 +117,35 @@ def records(request, data):
         items.append(item)
 
     return ret_response(0, {'items': items, 'total': total})
+
+
+@require_user_login
+def start(request, data):
+    contestid = data['contestid']
+    try:
+        contest = Contest.objects.get(id=contestid)
+    except Contest.DoesNotExist as cdne:
+        traceback.print_exc()
+        print(cdne.args)
+        return msg_response(1, msg=f'比赛{contestid}不存在')
+    except Exception as e:
+        traceback.print_exc()
+        print(e.args)
+        return msg_response(1, msg=f'比赛{contestid}不存在')
+
+    if contest.start > datetime.datetime.now():
+        return msg_response(1, msg=f'比赛{contestid}未开始')
+
+    if contest.end < datetime.datetime.now():
+        return msg_response(1, msg=f'比赛{contestid}已结束')
+
+    if contest.announced:
+        return msg_response(1, msg=f'比赛{contestid}已结束')
+
+    if contest.status == 'running':
+        return msg_response(1, msg=f'比赛{contestid}已开始')
+
+    contest.status = 'running'
+    contest.save()
+
+    return msg_response(0)

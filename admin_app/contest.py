@@ -25,12 +25,14 @@ def data2contest(data, user):
     password = data.get('password')
     password = None if password == "" else password
     rated = data['rated']
+    ordered = data['ordered']
 
     contest = Contest(name=name,
                       start=start,
                       latest=latest,
                       password=password,
                       rated=rated,
+                      ordered=ordered,
                       authorid=user)
     return contest
 
@@ -56,6 +58,7 @@ def get_contest(request, data):
                 'latest': contest.latest.strftime('%Y-%m-%d %H:%M:%S'),
                 'password': contest.password,
                 'rated': contest.rated,
+                'ordered': contest.ordered,
                 'time_limited': {
                     "single": 0,
                     "multiple": 0,
@@ -106,14 +109,13 @@ def modify_contest(request, data):
 
     _time = newdata['time_limited']
     problems = newdata['problems']
-    ordered = newdata['ordered']
 
     try:
         nt.save()
 
         ContestProblem.objects.filter(contestid_id=contestid).delete()
 
-        if not ordered:
+        if not contest.ordered:
             random.shuffle(problems)
 
         no = 1
@@ -150,13 +152,12 @@ def add_contest(request, data):
 
     problems = data['problems']
     _time = data['time_limited']
-    ordered = data['ordered']
 
     try:
         with transaction.atomic():
             contest.save()
 
-            if not ordered:
+            if not contest.ordered:
                 random.shuffle(problems)
 
             no = 1
