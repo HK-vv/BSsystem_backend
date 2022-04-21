@@ -10,4 +10,5 @@ urlpatterns = [
     path('exercise/problem/check', exercise.check),
     path('contest/register', contest.register),
     path('contest/records', contest.records),
+    path('contest/start', contest.start),
 ]

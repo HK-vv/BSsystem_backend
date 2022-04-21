@@ -70,6 +70,12 @@ class Test(TestCase):
                                 cookies=self.cookie)
         pprint.pprint(response.json())
 
+    def test_start(self):
+        self.test_login()
+        response = requests.get(f'http://{self.localhost}:{self.port}/api/user/contest/start?contestid=4',
+                                cookies=self.cookie)
+        pprint.pprint(response.json())
+
 
 if __name__ == '__main__':
     t = Test()

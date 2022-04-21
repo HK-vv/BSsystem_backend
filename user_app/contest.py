@@ -122,30 +122,37 @@ def records(request, data):
 @require_user_login
 def start(request, data):
     contestid = data['contestid']
+    user = BSUser.objects.get(openid=request.session['openid'])
+    cur = pytz.UTC.localize(datetime.datetime.now())
+
     try:
         contest = Contest.objects.get(id=contestid)
     except Contest.DoesNotExist as cdne:
         traceback.print_exc()
         print(cdne.args)
         return msg_response(1, msg=f'比赛{contestid}不存在')
+
+    if contest.start > cur:
+        return msg_response(1, msg=f'比赛{contestid}未开始')
+
+    elif contest.end < cur or contest.announced:
+        return msg_response(1, msg=f'比赛{contestid}已结束')
+
+    try:
+        reg = Registration.objects.get(userid=user, contestid=contest)
+        if reg.starttime is None:
+            reg.starttime = cur
+            reg.save()
+
+        # 计算比赛题目总共数量
+        total = ContestProblem.objects.filter(contestid=contest).count()
+
+        return ret_response(0, {'total': total})
+    except Registration.DoesNotExist as rdne:
+        traceback.print_exc()
+        print(rdne.args)
+        return msg_response(1, msg=f'您未注册比赛')
     except Exception as e:
         traceback.print_exc()
         print(e.args)
-        return msg_response(1, msg=f'比赛{contestid}不存在')
-
-    if contest.start > datetime.datetime.now():
-        return msg_response(1, msg=f'比赛{contestid}未开始')
-
-    if contest.end < datetime.datetime.now():
-        return msg_response(1, msg=f'比赛{contestid}已结束')
-
-    if contest.announced:
-        return msg_response(1, msg=f'比赛{contestid}已结束')
-
-    if contest.status == 'running':
-        return msg_response(1, msg=f'比赛{contestid}已开始')
-
-    contest.status = 'running'
-    contest.save()
-
-    return msg_response(0)
+        return msg_response(3)
