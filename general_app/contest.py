@@ -63,7 +63,8 @@ def contest_list(request, data):
             'author': contest.authorid.username
         }
 
-        contest_problem = ContestProblem.objects.filter(contestid=contest).order_by('number')
+        contest_problem = ContestProblem.objects.filter(contestid=contest)\
+            .exclude(problemid__isnull=True).order_by('number')
         problems = list(contest_problem.values('problemid', 'duration'))
 
         for it in problems:
