@@ -36,20 +36,28 @@ def data2problem(data, user):
                       public=public,
                       authorid=user)
 
-    # problem = Problem.objects.create(description=description,
-    #                                  answer=answer,
-    #                                  public=public,
-    #                                  authorid=user)
-
     # 单选 多选
     if type in ['single', 'multiple']:
         if A and B and C and D:
+            too_long = []
+            if len(A) > 25:
+                too_long.append("选项1")
+            if len(B) > 25:
+                too_long.append("选项2")
+            if len(C) > 25:
+                too_long.append("选项3")
+            if len(D) > 25:
+                too_long.append("选项4")
+            if len(too_long) > 0:
+                # 将too_long列表的字符连接，并用顿号分隔
+                errs = "、".join(too_long)
+                raise Exception(f"{errs}过长")
             problem.A = A
             problem.B = B
             problem.C = C
             problem.D = D
         else:
-            raise Exception("该行选项为空")
+            raise Exception("选项为空")
     # 判断
     elif type == 'binary':
         problem.A = '正确'
@@ -67,20 +75,28 @@ def data2problem(data, user):
 
 
 def excel2problems(table, user):
+    errors = []
     try:
         with transaction.atomic():
             problems = []
             for i in range(len(table)):
                 data = table.iloc[i]
-                problem = data2problem(data, user)
-                problem.save()
-                problems.append(problem)
+                try:
+                    problem = data2problem(data, user)
+                    problem.save()
+                    problems.append(problem)
+                except Exception as e:
+                    errors.append(f"第{i + 2}行 {e.args[0]}")
+                    continue
+
+            if len(errors) > 0:
+                str = ", \n".join(errors)
+                raise Exception(str)
+
             return problems
 
     except Exception as e:
-        traceback.print_exc()
-        print(e.args)
-        raise Exception(f"第{i + 2}行格式错误")
+        raise Exception(e.args[0])
 
 
 @require_admin_login
@@ -94,17 +110,9 @@ def batch_add(request, data):
     file = request.FILES.get('file')
     file_name = file.name
 
-    if SAVED:
-        # 拼接文件路径
-        path = os.path.join(settings.BASE_DIR, FOLDER_NAME)
-        if not os.path.exists(path):
-            os.mkdir(path)
-        with open(os.path.join(path, file_name), 'wb')as f:
-            for i in file.chunks():
-                f.write(i)
-
     try:
-        table = pd.read_excel(file)
+        table = pd.read_excel(file, dtype={'题目': 'str', '选项1': 'str', '选项2': 'str', '选项3': 'str', '选项4': 'str',
+                                           '正确答案': 'str'})
         table.rename(columns={'题目': 'description', '题型': 'type', '选项1': 'A', '选项2': 'B', '选项3': 'C', '选项4': 'D',
                               '正确答案': 'answer', '是否公开': 'public'}, inplace=True)
         table.replace({"public": {'公开': True, '不公开': False}}, inplace=True)
@@ -123,7 +131,7 @@ def batch_add(request, data):
     except Exception as e:
         traceback.print_exc()
         print(e.args)
-        return msg_response(1, msg=e.args)
+        return msg_response(1, msg=e.args[0])
 
     tagsid = list(Tag.objects.filter(name__in=tags).values_list('id', flat=True))
 
@@ -131,6 +139,15 @@ def batch_add(request, data):
         for problem in problems:
             ProblemTag.objects.create(problemid=problem,
                                       tagid_id=id)
+
+    if SAVED:
+        # 拼接文件路径
+        path = os.path.join(settings.BASE_DIR, FOLDER_NAME)
+        if not os.path.exists(path):
+            os.mkdir(path)
+        with open(os.path.join(path, file_name), 'wb')as f:
+            for i in file.chunks():
+                f.write(i)
 
     if OUTPUT_LOG:
         print(f"{user.username} 批量添加了题目")
@@ -257,7 +274,9 @@ def modify_problem(request, data):
         np = data2problem(nd, author)
         np.id = prob.id
     except Exception as e:
-        return msg_response(1, e.args)
+        traceback.print_exc()
+        print(e.args)
+        return msg_response(1, e.args[0])
 
     try:
         np.save()
@@ -301,7 +320,7 @@ def add_problem(request, data):
     except Exception as e:
         traceback.print_exc()
         print(e.args)
-        return msg_response(1, '题目格式有误')
+        return msg_response(1, e.args[0])
 
     if OUTPUT_LOG:
         print(f"{user.username} 添加了题目 {problem.id}")

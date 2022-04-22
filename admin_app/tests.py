@@ -62,7 +62,7 @@ class Test(TestCase):
             ],
             "description": "请选出所有OJ",
             "options": [
-                "Codeforces",
+                "Codeforce",
                 "DBforces",
             ],
             "answer": "ABC",
