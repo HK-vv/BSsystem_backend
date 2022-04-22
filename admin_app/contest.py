@@ -75,7 +75,7 @@ def get_contest(request, data):
 
         for item in problems:
             problemid = item['problemid']
-            if Problem.objects.get(id=problemid):
+            if Problem.objects.filter(id=problemid).exists():
                 problem = Problem.objects.get(id=problemid)
                 info['time_limited'][problem.type] = item['duration']
             problemsid.append(problemid)
