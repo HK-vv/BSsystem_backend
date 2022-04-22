@@ -68,7 +68,7 @@ def contest_list(request, data):
 
         for it in problems:
             problemid = it['problemid']
-            if Problem.objects.get(id=problemid):
+            if Problem.objects.filter(id=problemid).exists():
                 problem = Problem.objects.get(id=problemid)
                 item['time_limited'][problem.type] = it['duration']
 
