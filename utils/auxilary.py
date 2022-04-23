@@ -47,3 +47,11 @@ def dict_list_decorator(ori: list, mp: dict) -> list:
         for a, b in mp:
             x[b] = x.pop(a)
     return ori
+
+
+def get_ip_address(request):
+    ip = request.META.get("HTTP_X_FORWARDED_FOR", "")
+    if not ip:
+        ip = request.META.get('REMOTE_ADDR', "")
+    client_ip = ip.split(",")[-1].strip() if ip else ""
+    return client_ip

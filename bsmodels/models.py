@@ -108,6 +108,20 @@ class Problem(models.Model):
             correct = self.__completion_check(answer, ur_answer)
         return correct
 
+    def get_options(self):
+        if type == 'single':
+            options = [self.A, self.B, self.C, self.D]
+        # 多选
+        elif type == 'multiple':
+            options = [self.A, self.B, self.C, self.D]
+        # 判断
+        elif type == 'binary':
+            options = [self.A, self.B]
+        # 填空
+        else:
+            options = []
+        return options
+
 
 class Contest(models.Model):
     id = models.AutoField(primary_key=True)
@@ -141,6 +155,18 @@ class Contest(models.Model):
             return 'finished'
         else:
             return 'shut'
+
+    def get_problems(self):
+        ps = ContestProblem.objects.filter(contestid=self) \
+            .order_by('number')
+        ps = list(ps.values('number', 'problemid', 'duration'))
+        ret = {}
+        for x in ps:
+            ret[x['number']] = {'id': x['problemid'], 'dt': x['duration']}
+        return ret
+
+    def count_problem(self):
+        return ContestProblem.objects.filter(contestid=self).count()
 
 
 class ContestProblem(models.Model):
@@ -185,8 +211,17 @@ class Record(models.Model):
     userid = models.ForeignKey(BSUser, on_delete=models.SET_NULL, blank=True, null=True)
     contestid = models.ForeignKey(Contest, on_delete=models.SET_NULL, blank=True, null=True)
     problemid = models.ForeignKey(Problem, on_delete=models.SET_NULL, blank=True, null=True)
-    result = models.CharField(max_length=10, choices=[("正确", "正确"), ("错误", "错误")])
+    result = models.CharField(max_length=10, choices=[("T", "right"), ("F", "wrong")])
     submitted = models.CharField(max_length=100, null=True)
 
     class Meta:
         unique_together = ("userid", "contestid", "problemid")
+
+    def __init__(self, reg, pno, ans, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.userid = reg.userid
+        self.contestid = reg.contestid
+        self.problemid = ContestProblem.objects.get(contestid=reg.contestid, number=pno).problemid
+        res = self.problemid.iscorrect(ans)
+        self.result = "T" if res else "F"
+        self.submitted = ans

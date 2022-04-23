@@ -4,7 +4,7 @@ import pytz
 from django.core.paginator import Paginator
 from django.db import transaction
 
-from bsmodels.models import Contest, BSUser, Registration, ContestProblem, Problem
+from bsmodels.models import Contest, BSUser, Registration, ContestProblem, Problem, Record
 from utils.auxilary import msg_response, ret_response
 from utils.decorators import require_user_login
 
@@ -35,7 +35,8 @@ def register(request, data):
 
         Registration.objects.create(userid=user,
                                     contestid=contest,
-                                    regtime=cur)
+                                    regtime=cur,
+                                    currentnumber=0)
 
     except Contest.DoesNotExist as cdne:
         traceback.print_exc()
@@ -50,7 +51,7 @@ def register(request, data):
 
 
 @require_user_login
-def records(request, data):
+def contest_history(request, data):
     openid = request.session['openid']
     user = BSUser.objects.get(openid=openid)
 
@@ -150,3 +151,76 @@ def start(request, data):
         traceback.print_exc()
         print(e.args)
         return msg_response(3)
+
+
+@require_user_login
+def get_next_problem(request, data):
+    cid = data['contestid']
+
+    with transaction.atomic():
+        reg = Registration.objects.get(userid=request.user, contestid_id=cid)
+        if not reg:
+            return msg_response(1, msg=f"您未注册比赛")
+        contest = Contest.objects.get(id=cid)
+        reg = Registration.objects.get(userid=request.user, contestid_id=cid)
+        nc = reg.currentnumber
+        tc = reg.currenttime
+        ps = contest.get_problemids()
+        totn = len(ps)
+
+        t = pytz.UTC.localize(datetime.datetime.now())
+        sum = datetime.timedelta(seconds=0)
+        for k in range(nc, totn + 1):
+            if sum <= t - tc < sum + datetime.timedelta(seconds=ps[k]['dt']):
+                break
+            sum += datetime.timedelta(seconds=ps[k]['dt'])
+        tar = max(k, nc + 1)
+        if tar > totn:
+            return msg_response(1, msg=f'比赛完成')
+
+        sum = datetime.timedelta(seconds=0)
+        for k in range(nc, tar + 1):
+            sum += datetime.timedelta(seconds=ps[k]['dt'])
+        tardt = min(sum - (t - tc), ps[tar]['dt'])
+        assert tardt > datetime.timedelta(seconds=0)
+
+        reg.currentnumber = tar
+        reg.save()
+
+    problem = Problem.objects.get(id=ps[tar]['id'])
+    fp = {
+        'type': problem.type,
+        'description': problem.description,
+        'options': problem.get_options(),
+        'problemnum': tar,
+        'time': tardt
+    }
+    return ret_response(0, fp)
+
+
+@require_user_login
+def submit_answer(request, data):
+    cid = data['contestid']
+    pn = data['problemnum']
+    ans = data['user_answer']
+
+    with transaction.atomic():
+        reg = Registration.objects.get(userid=request.user, contestid_id=cid)
+        if not reg:
+            return msg_response(1, msg=f"您未注册比赛")
+        nc = reg.currentnumber
+        tc = reg.currenttime
+        contest = Contest.objects.get(id=cid)
+        ps = contest.get_problemids()
+        t = pytz.UTC.localize(datetime.datetime.now())
+
+        if t - tc <= datetime.timedelta(seconds=ps[nc]['dt']):
+            pass
+        else:
+            return msg_response(1, msg=f"已超时")
+
+        reg.currenttime = t
+        reg.save()
+        Record(reg=reg, pno=nc, ans=ans).save()
+
+    return msg_response(0)

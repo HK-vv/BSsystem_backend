@@ -50,33 +50,22 @@ def collect_problem(request, data):
 
 @require_user_login
 def get_problem(request, data):
-    id = data['id']
+    pid = data['id']
 
     try:
-        problem = Problem.objects.get(id=id)
+        problem = Problem.objects.get(id=pid)
         # 题目不公开
         if not problem.public:
             return msg_response(1, msg='题目未公开')
-        type = problem.type
-        # 单选
-        if type == 'single':
-            options = [problem.A, problem.B, problem.C, problem.D]
-        # 多选
-        elif type == 'multiple':
-            options = [problem.A, problem.B, problem.C, problem.D]
-        # 判断
-        elif type == 'binary':
-            options = [problem.A, problem.B]
-        # 填空
-        else:
-            options = []
+        typ = problem.type
+        options = problem.get_options()
 
         if OUTPUT_LOG:
             user = BSUser.objects.get(openid=request.session['openid'])
-            print(f"{user.username} 正在练习第 {id} 题")
+            print(f"{user.username} 正在练习第 {pid} 题")
 
         return JsonResponse({'ret': 0,
-                             'type': type,
+                             'type': typ,
                              'description': problem.description,
                              'options': options
                              })

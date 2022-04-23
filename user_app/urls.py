@@ -9,6 +9,8 @@ urlpatterns = [
     path('exercise/problem', exercise.get_problem),
     path('exercise/problem/check', exercise.check),
     path('contest/register', contest.register),
-    path('contest/records', contest.records),
+    path('contest/records', contest.contest_history),
     path('contest/start', contest.start),
+    path('contest/problem', contest.get_next_problem),
+    path('contest/submit', contest.submit_answer)
 ]

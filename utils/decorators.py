@@ -1,8 +1,18 @@
 import traceback
 from functools import wraps
-from utils.auxilary import msg_response, get_data, session_expired
+from utils.auxilary import msg_response, get_data, session_expired, get_ip_address
 
 
+def print_info(func):
+    @wraps(func)
+    def inner(request, *args, **kwargs):
+        print(f"request from {get_ip_address(request)}")
+        return func(request, *args, **kwargs)
+
+    return inner
+
+
+@print_info
 def require_nothing(func):
     @wraps(func)
     def inner(request, *args, **kwargs):
@@ -16,6 +26,7 @@ def require_nothing(func):
     return inner
 
 
+@print_info
 def require_admin_login(func):
     @wraps(func)
     def inner(request, *args, **kwargs):
@@ -31,6 +42,7 @@ def require_admin_login(func):
     return inner
 
 
+@print_info
 def require_super_login(func):
     @wraps(func)
     def inner(request, *args, **kwargs):
@@ -48,6 +60,7 @@ def require_super_login(func):
     return inner
 
 
+@print_info
 def require_user_login(func):
     @wraps(func)
     def inner(request, *args, **kwargs):
