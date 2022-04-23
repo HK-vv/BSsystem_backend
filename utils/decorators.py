@@ -48,19 +48,6 @@ def require_super_login(func):
     return inner
 
 
-def need_user_login(func):
-    @wraps(func)
-    def inner(request, *args, **kwargs):
-        try:
-            return func(request, get_data(request), *args, **kwargs)
-        except Exception as e:
-            traceback.print_exc()
-            print(e.args)
-            return msg_response(3)
-
-    return inner
-
-
 def require_user_login(func):
     @wraps(func)
     def inner(request, *args, **kwargs):

@@ -11,7 +11,7 @@ DEBUG = False
 
 
 # 登陆
-@need_user_login
+@require_nothing
 def login(request, data):
     code = data['code']
 

@@ -1,5 +1,6 @@
 import datetime
 
+import pytz
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -39,6 +40,7 @@ class Problem(models.Model):
     answer = models.CharField(max_length=100)
     public = models.BooleanField()
     authorid = models.ForeignKey(BSAdmin, on_delete=models.SET_NULL, blank=True, null=True)
+
     # tags = models.ManyToManyField(Tag, through=ProblemTag)
 
     # 选择题
@@ -118,6 +120,7 @@ class Contest(models.Model):
     announced = models.BooleanField(default=False)
     ordered = models.BooleanField(default=False)
     authorid = models.ForeignKey(BSAdmin, on_delete=models.SET_NULL, blank=True, null=True)
+
     # problems = models.ManyToManyField(Problem, through=ContestProblem)
 
     def get_end_time(self):
@@ -127,6 +130,17 @@ class Contest(models.Model):
             max_time += problem.duration
 
         return self.latest + datetime.timedelta(seconds=max_time)
+
+    def get_status(self):
+        cur = pytz.UTC.localize(datetime.datetime.now())
+        if cur < self.start:
+            return 'upcoming'
+        elif cur < self.end:
+            return 'running'
+        elif self.announced:
+            return 'finished'
+        else:
+            return 'shut'
 
 
 class ContestProblem(models.Model):

@@ -23,11 +23,11 @@ def contest_list(request, data):
 
         if type == 'upcoming':
             lst = lst.filter(start__gt=cur)
-        elif type == 'history':
+        elif type == 'finished':
             lst = lst.filter(announced=True)
-        elif type == 'in_progress':
+        elif type == 'running':
             lst = lst.filter(Q(end__gt=cur) & Q(start__lte=cur))
-        elif type == 'to_be_announced':
+        elif type == 'shut':
             lst = lst.filter(Q(end__lte=cur) & Q(announced=False))
 
     if data.get('keyword'):
@@ -63,7 +63,7 @@ def contest_list(request, data):
             'author': contest.authorid.username
         }
 
-        contest_problem = ContestProblem.objects.filter(contestid=contest)\
+        contest_problem = ContestProblem.objects.filter(contestid=contest) \
             .exclude(problemid__isnull=True).order_by('number')
         problems = list(contest_problem.values('problemid', 'duration'))
 
@@ -78,14 +78,7 @@ def contest_list(request, data):
         if contest.end is None:
             contest.end = contest.get_end_time()
 
-        if cur < contest.start:
-            item['status'] = '未开始'
-        elif cur < contest.end:
-            item['status'] = '比赛中'
-        elif contest.announced:
-            item['status'] = '已结束'
-        else:
-            item['status'] = '待公布成绩'
+        item['status'] = contest.get_status()
 
         items.append(item)
 

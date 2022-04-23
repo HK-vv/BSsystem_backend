@@ -59,8 +59,6 @@ def records(request, data):
 
     lst = Registration.objects.filter(userid=user)
 
-    cur = pytz.UTC.localize(datetime.datetime.now())
-
     if data.get('keyword'):
         keyword = data['keyword']
         lst = lst.select_related('contestid').filter(contestid__name__icontains=keyword)
@@ -106,14 +104,7 @@ def records(request, data):
 
         item['register_num'] = Registration.objects.filter(contestid=contestid).count()
 
-        if cur < contest.start:
-            item['status'] = '未开始'
-        elif cur < contest.end:
-            item['status'] = '比赛中'
-        elif contest.announced:
-            item['status'] = '已结束'
-        else:
-            item['status'] = '待公布成绩'
+        item['status'] = contest.get_status()
 
         items.append(item)
 
