@@ -67,6 +67,7 @@ def require_user_login(func):
         if session_expired(request, 'openid'):
             return msg_response(2)
         try:
+            request.user_id = request.session['openid']
             return func(request, get_data(request), *args, **kwargs)
         except Exception as e:
             traceback.print_exc()
