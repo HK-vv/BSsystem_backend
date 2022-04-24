@@ -76,6 +76,13 @@ class Test(TestCase):
                                 cookies=self.cookie)
         pprint.pprint(response.json())
 
+    def test_list_contest(self):
+        self.test_login()
+        response = requests.get(f'http://{self.localhost}:{self.port}/api/general/contest/list?pagesize=5'
+                                f'&pagenum=1&type=in_progress',
+                                cookies=self.cookie)
+        pprint.pprint(response.json())
+
 
 if __name__ == '__main__':
     t = Test()
