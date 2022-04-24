@@ -1,15 +1,23 @@
 import traceback
 from functools import wraps
+
+from bsmodels.models import BSUser
 from utils.auxilary import msg_response, get_data, session_expired, get_ip_address
 
 
-def print_info(func):
-    @wraps(func)
-    def inner(request, *args, **kwargs):
-        print(f"request from {get_ip_address(request)}")
-        return func(request, *args, **kwargs)
+def print_info(dec):
+    @wraps(dec)
+    def dec_level(func, *args, **kwargs):
+        @wraps(func)
+        def inner(request, *args, **kwargs):
+            print(f"request from {get_ip_address(request)}")
+            r = func(request, *args, **kwargs)
+            print("---------------------------------------")
+            return r
 
-    return inner
+        return inner
+
+    return dec_level
 
 
 @print_info
@@ -67,7 +75,7 @@ def require_user_login(func):
         if session_expired(request, 'openid'):
             return msg_response(2)
         try:
-            request.user_id = request.session['openid']
+            request.user = BSUser.objects.get(id=request.session['openid'])
             return func(request, get_data(request), *args, **kwargs)
         except Exception as e:
             traceback.print_exc()

@@ -158,11 +158,11 @@ def get_next_problem(request, data):
     cid = data['contestid']
 
     with transaction.atomic():
-        reg = Registration.objects.get(userid=request.user_id, contestid_id=cid)
+        reg = Registration.objects.get(userid=request.user, contestid_id=cid)
         if not reg:
             return msg_response(1, msg=f"您未注册比赛")
         contest = Contest.objects.get(id=cid)
-        reg = Registration.objects.get(userid=request.user_id, contestid_id=cid)
+        reg = Registration.objects.get(userid=request.user, contestid_id=cid)
         nc = reg.currentnumber
         tc = reg.currenttime
         ps = contest.get_problemids()
@@ -184,7 +184,7 @@ def get_next_problem(request, data):
         tardt = min(sum - (t - tc), ps[tar]['dt'])
         assert tardt > datetime.timedelta(seconds=0)
 
-        reg.currentnumber = tar
+        reg.currentnumber = tar # TODO: yet to deal
         reg.save()
 
     problem = Problem.objects.get(id=ps[tar]['id'])
@@ -205,7 +205,7 @@ def submit_answer(request, data):
     ans = data['user_answer']
 
     with transaction.atomic():
-        reg = Registration.objects.get(userid=request.user_id, contestid_id=cid)
+        reg = Registration.objects.get(userid=request.user, contestid_id=cid)
         if not reg:
             return msg_response(1, msg=f"您未注册比赛")
         nc = reg.currentnumber
