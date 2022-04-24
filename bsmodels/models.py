@@ -255,6 +255,7 @@ class Registration(models.Model):
             self.currenttime = t - (ps[k]['dt'] - tardt)
         else:
             self.currentnumber = totn + 1
+            self.currenttime = t
         self.save()
 
     def submit_current(self, ans, check_pn=None):
