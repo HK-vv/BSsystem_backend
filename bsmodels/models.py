@@ -112,13 +112,13 @@ class Problem(models.Model):
         return correct
 
     def get_options(self):
-        if type == 'single':
+        if self.type == 'single':
             options = [self.A, self.B, self.C, self.D]
         # 多选
-        elif type == 'multiple':
+        elif self.type == 'multiple':
             options = [self.A, self.B, self.C, self.D]
         # 判断
-        elif type == 'binary':
+        elif self.type == 'binary':
             options = [self.A, self.B]
         # 填空
         else:
