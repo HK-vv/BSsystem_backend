@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from django.db import transaction
 
 from bsmodels.models import Contest, BSUser, Registration, ContestProblem, Problem, Record
-from utils.auxilary import msg_response, ret_response
+from utils.auxilary import msg_response, ret_response, get_current_time
 from utils.decorators import require_user_login
 
 
@@ -116,7 +116,7 @@ def contest_history(request, data):
 def start(request, data):
     contestid = data['contestid']
     user = BSUser.objects.get(openid=request.session['openid'])
-    cur = pytz.UTC.localize(datetime.datetime.now())
+    cur = get_current_time()
 
     try:
         contest = Contest.objects.get(id=contestid)
@@ -132,14 +132,7 @@ def start(request, data):
         return msg_response(1, msg=f'比赛{contestid}已结束')
 
     try:
-        with transaction.atomic():
-            reg = Registration.objects.get(userid=user, contestid=contest)
-            if reg.starttime is None:
-                reg.starttime = cur
-                reg.currenttime = cur
-                reg.save()
-
-        # 计算比赛题目总共数量
+        Registration.objects.get(userid=user, contestid=contest).start()
         total = ContestProblem.objects.filter(contestid=contest).count()
 
         return ret_response(0, {'total': total})
@@ -147,53 +140,23 @@ def start(request, data):
         traceback.print_exc()
         print(rdne.args)
         return msg_response(1, msg=f'您未注册比赛')
-    except Exception as e:
-        traceback.print_exc()
-        print(e.args)
-        return msg_response(3)
 
 
 @require_user_login
-def get_next_problem(request, data):
+def get_problem(request, data):
     cid = data['contestid']
+    reg = Registration.objects.get(contestid_id=cid, userid=request.user)
+    if not reg:
+        return msg_response(1, msg=f"您未注册比赛")
 
-    with transaction.atomic():
-        reg = Registration.objects.get(userid=request.user, contestid_id=cid)
-        if not reg:
-            return msg_response(1, msg=f"您未注册比赛")
-        contest = Contest.objects.get(id=cid)
-        reg = Registration.objects.get(userid=request.user, contestid_id=cid)
-        nc = reg.currentnumber
-        tc = reg.currenttime
-        ps = contest.get_problemids()
-        totn = len(ps)
-
-        t = pytz.UTC.localize(datetime.datetime.now())
-        sum = datetime.timedelta(seconds=0)
-        for k in range(nc, totn + 1):
-            if sum <= t - tc < sum + datetime.timedelta(seconds=ps[k]['dt']):
-                break
-            sum += datetime.timedelta(seconds=ps[k]['dt'])
-        tar = max(k, nc + 1)
-        if tar > totn:
-            return msg_response(1, msg=f'比赛完成')
-
-        sum = datetime.timedelta(seconds=0)
-        for k in range(nc, tar + 1):
-            sum += datetime.timedelta(seconds=ps[k]['dt'])
-        tardt = min(sum - (t - tc), ps[tar]['dt'])
-        assert tardt > datetime.timedelta(seconds=0)
-
-        reg.currentnumber = tar # TODO: yet to deal
-        reg.save()
-
-    problem = Problem.objects.get(id=ps[tar]['id'])
+    problem, nc, dt = reg.get_current_problem()
     fp = {
         'type': problem.type,
         'description': problem.description,
         'options': problem.get_options(),
-        'problemnum': tar,
-        'time': tardt
+        'problemnum': nc,
+        'time': dt,
+        'total_number': reg.contestid.count_problem()
     }
     return ret_response(0, fp)
 
@@ -203,24 +166,21 @@ def submit_answer(request, data):
     cid = data['contestid']
     pn = data['problemnum']
     ans = data['user_answer']
+    reg = Registration.objects.get(userid=request.user, contestid_id=cid)
+    if not reg:
+        return msg_response(1, msg=f"您未注册比赛")
 
-    with transaction.atomic():
-        reg = Registration.objects.get(userid=request.user, contestid_id=cid)
-        if not reg:
-            return msg_response(1, msg=f"您未注册比赛")
-        nc = reg.currentnumber
-        tc = reg.currenttime
-        contest = Contest.objects.get(id=cid)
-        ps = contest.get_problemids()
-        t = pytz.UTC.localize(datetime.datetime.now())
+    r = None
+    try:
+        with transaction.atomic():
+            r = reg.submit_current(ans, pn)
+            reg.next_problem()
+    except Exception as e:
+        if isinstance(e.args[0], str):
+            return msg_response(1, e.args[0])
+        raise e
 
-        if t - tc <= datetime.timedelta(seconds=ps[nc]['dt']):
-            pass
-        else:
-            return msg_response(1, msg=f"已超时")
-
-        reg.currenttime = t
-        reg.save()
-        Record(reg=reg, pno=nc, ans=ans).save()
-
-    return msg_response(0)
+    if r == "timeout":
+        return msg_response(0, "Timeout")
+    else:
+        return msg_response(0, "Success")

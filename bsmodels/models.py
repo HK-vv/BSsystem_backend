@@ -2,7 +2,10 @@ import datetime
 
 import pytz
 from django.contrib.auth.models import AbstractUser
-from django.db import models
+from django.db import models, transaction
+
+from brainstorm.settings import OUTPUT_LOG
+from utils.auxilary import get_current_time
 
 
 class BSUser(models.Model):
@@ -190,8 +193,8 @@ class ProblemTag(models.Model):
 
 
 class Registration(models.Model):
-    userid = models.ForeignKey(BSUser, on_delete=models.SET_NULL, blank=True, null=True)
-    contestid = models.ForeignKey(Contest, on_delete=models.SET_NULL, blank=True, null=True)
+    userid = models.ForeignKey(BSUser, on_delete=models.CASCADE, blank=True, null=True)
+    contestid = models.ForeignKey(Contest, on_delete=models.CASCADE, blank=True, null=True)
     regtime = models.DateTimeField()
     starttime = models.DateTimeField(null=True)
     currentnumber = models.IntegerField(default=0)
@@ -205,6 +208,77 @@ class Registration(models.Model):
 
     class Meta:
         unique_together = ("userid", "contestid")
+
+    def start(self):
+        with transaction.atomic():
+            contest = self.contestid
+            cur = get_current_time()
+            if not contest.start <= cur <= contest.latest:
+                raise Exception("Not in time window")
+            if self.starttime is None:
+                self.starttime = cur
+                self.currenttime = cur
+                self.currentnumber = 1
+                self.save()
+
+    def next_problem(self):
+        """
+            Note that this function only moves pointers.
+            It does not return the problem object. Use `get_current_problem()` instead.
+        """
+        contest = self.contestid
+        nc = self.currentnumber
+        tc = self.currenttime
+        ps = contest.get_problems()
+        totn = len(ps)
+
+        if nc > totn:
+            return
+        t = get_current_time()
+        sm = datetime.timedelta(seconds=0)
+        k = nc
+        while k <= totn:
+            if sm <= t - tc < sm + datetime.timedelta(seconds=ps[k]['dt']):
+                break
+            sm += datetime.timedelta(seconds=ps[k]['dt'])
+            k += 1
+        tar = max(k, nc + 1)
+        if tar <= totn:
+            sm = datetime.timedelta(seconds=0)
+            for k in range(nc, tar + 1):
+                sm += datetime.timedelta(seconds=ps[k]['dt'])
+            tardt = min(sm - (t - tc), ps[tar]['dt'])
+            assert tardt > datetime.timedelta(seconds=0)
+
+            # update two pointers at the same time
+            self.currentnumber = tar
+            self.currenttime = t - (ps[k]['dt'] - tardt)
+        else:
+            self.currentnumber = totn + 1
+        self.save()
+
+    def submit_current(self, ans, check_pn=None):
+        nc = self.currentnumber
+        tc = self.currenttime
+        contest = self.contestid
+        ps = contest.get_problems()
+        t = get_current_time()
+
+        if check_pn and check_pn != nc:
+            raise Exception("wrong problem to answer")
+        if t - tc > datetime.timedelta(seconds=ps[nc]['dt']):
+            if OUTPUT_LOG:
+                print(f"timeout on {nc}th problem ")
+            return "timeout"
+
+        Record(reg=self, pno=nc, ans=ans).save()
+
+    def get_current_problem(self):
+        totn = Contest.objects.get(contestid=self).count_problem()
+        t = get_current_time()
+        if 0 < self.currentnumber <= totn:
+            ct = ContestProblem.objects.get(contestid=self, number=self.currentnumber)
+            return ct.problemid, self.currentnumber, (ct.duration - (t - self.currenttime)).total_seconds()
 
 
 class Record(models.Model):

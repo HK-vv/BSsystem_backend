@@ -1,4 +1,7 @@
+import datetime
 import json
+
+import pytz
 from django.http import JsonResponse
 from bsmodels.models import Problem
 
@@ -55,3 +58,7 @@ def get_ip_address(request):
         ip = request.META.get('REMOTE_ADDR', "")
     client_ip = ip.split(",")[-1].strip() if ip else ""
     return client_ip
+
+
+def get_current_time():
+    return pytz.UTC.localize(datetime.datetime.now())
