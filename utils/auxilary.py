@@ -3,6 +3,7 @@ import json
 
 import pytz
 from django.http import JsonResponse
+from ipware.ip import get_client_ip
 
 from brainstorm.settings import OUTPUT_LOG
 
@@ -67,4 +68,4 @@ def get_current_time():
 
 def output_request_info(request):
     if OUTPUT_LOG:
-        print(f"Request received from {get_ip_address(request)}")
+        print(f"Request received from {get_client_ip(request)}")
