@@ -63,8 +63,8 @@ def contest_list(request, data):
             'author': contest.authorid.username
         }
 
-        if request.session.get('userid'):
-            if Registration.objects.filter(contestid=contestid, userid_id=request.user_id).exists():
+        if request.session.get('openid'):
+            if Registration.objects.filter(contestid=contestid, userid_id=request.session.get('openid')).exists():
                 item['registered'] = True
             else:
                 item['registered'] = False
