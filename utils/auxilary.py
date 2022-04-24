@@ -3,8 +3,6 @@ import json
 
 import pytz
 from django.http import JsonResponse
-from django.utils.deprecation import MiddlewareMixin
-from ipware.ip import get_client_ip
 
 from brainstorm.settings import OUTPUT_LOG
 
@@ -55,22 +53,18 @@ def dict_list_decorator(ori: list, mp: dict) -> list:
     return ori
 
 
-def get_ip_address(request):
-    ip = request.META.get("HTTP_X_FORWARDED_FOR", "")
-    if not ip:
-        ip = request.META.get('REMOTE_ADDR', "")
-    client_ip = ip.split(",")[-1].strip() if ip else ""
-    return client_ip
-
-
 def get_current_time():
     return pytz.UTC.localize(datetime.datetime.now())
+
+
+def get_ip(request):
+    ip = request.META.get('HTTP_X_FORWARDED_FOR')
+    if not ip:
+        ip = request.META.get('REMOTE_ADDR', 'retrieve IP failed')
+    return ip
 
 
 def output_request_info(request):
     if OUTPUT_LOG:
         remote_ip = request.META.get('REMOTE_ADDR', 'retrieve IP failed')
-        print(f"Request received from {remote_ip}")
-
-
-
+        print(f"Request received from {get_ip(request)}")
