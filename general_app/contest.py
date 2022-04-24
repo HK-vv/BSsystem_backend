@@ -63,6 +63,12 @@ def contest_list(request, data):
             'author': contest.authorid.username
         }
 
+        if request.session.get('userid'):
+            if Registration.objects.filter(contestid=contestid, userid_id=request.user_id).exists():
+                item['registered'] = True
+            else:
+                item['registered'] = False
+
         contest_problem = ContestProblem.objects.filter(contestid=contest) \
             .exclude(problemid__isnull=True).order_by('number')
         problems = list(contest_problem.values('problemid', 'duration'))
