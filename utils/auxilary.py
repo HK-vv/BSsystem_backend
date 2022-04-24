@@ -66,5 +66,4 @@ def get_ip(request):
 
 def output_request_info(request):
     if OUTPUT_LOG:
-        remote_ip = request.META.get('REMOTE_ADDR', 'retrieve IP failed')
         print(f"Request received from {get_ip(request)}")

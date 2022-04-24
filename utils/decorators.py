@@ -8,7 +8,6 @@ from utils.auxilary import msg_response, get_data, session_expired, output_reque
 def require_nothing(func):
     @wraps(func)
     def inner(request, *args, **kwargs):
-        output_request_info(request)
         try:
             return func(request, get_data(request), *args, **kwargs)
         except Exception as e:
@@ -22,7 +21,6 @@ def require_nothing(func):
 def require_admin_login(func):
     @wraps(func)
     def inner(request, *args, **kwargs):
-        output_request_info(request)
         if not request.user.is_authenticated:
             return msg_response(2)
         try:
@@ -38,7 +36,6 @@ def require_admin_login(func):
 def require_super_login(func):
     @wraps(func)
     def inner(request, *args, **kwargs):
-        output_request_info(request)
         if not request.user.is_authenticated:
             return msg_response(2)
         if not request.user.is_superuser:
@@ -56,7 +53,6 @@ def require_super_login(func):
 def require_user_login(func):
     @wraps(func)
     def inner(request, *args, **kwargs):
-        output_request_info(request)
         if session_expired(request, 'openid'):
             return msg_response(2)
         try:
