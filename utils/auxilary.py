@@ -3,6 +3,7 @@ import json
 
 import pytz
 from django.http import JsonResponse
+from django.utils.deprecation import MiddlewareMixin
 from ipware.ip import get_client_ip
 
 from brainstorm.settings import OUTPUT_LOG
@@ -68,4 +69,8 @@ def get_current_time():
 
 def output_request_info(request):
     if OUTPUT_LOG:
-        print(f"Request received from {get_client_ip(request)}")
+        remote_ip = request.META.get('REMOTE_ADDR', 'retrieve IP failed')
+        print(f"Request received from {remote_ip}")
+
+
+
