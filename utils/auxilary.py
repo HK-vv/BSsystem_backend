@@ -3,7 +3,8 @@ import json
 
 import pytz
 from django.http import JsonResponse
-from bsmodels.models import Problem
+
+from brainstorm.settings import OUTPUT_LOG
 
 
 def get_data(request):
@@ -62,3 +63,8 @@ def get_ip_address(request):
 
 def get_current_time():
     return pytz.UTC.localize(datetime.datetime.now())
+
+
+def output_request_info(request):
+    if OUTPUT_LOG:
+        print(f"Request received from {get_ip_address(request)}")
