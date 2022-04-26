@@ -41,8 +41,9 @@ class Test(TestCase):
                                  json=payload)
         pprint.pprint(response.json())
 
-    def test_get_problem(self, id):
-        response = requests.get(f'http://{self.localhost}:{self.port}/api/user/exercise/problem?id={id}', cookies=self.cookie)
+    def test_get_problem(self):
+        self.test_login()
+        response = requests.get(f'http://{self.localhost}:{self.port}/api/user/exercise/problem?id=1', cookies=self.cookie)
         pprint.pprint(response.json())
 
     def test_check(self, id, answer):
