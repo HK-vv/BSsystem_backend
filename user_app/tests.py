@@ -86,7 +86,7 @@ class Test(TestCase):
 
     def test_record(self):
         self.test_login()
-        response = requests.get(f'http://{self.localhost}:{self.port}/api/user/contest/record?contestid=2',
+        response = requests.get(f'http://{self.localhost}:{self.port}/api/user/contest/result?contestid=2',
                                 cookies=self.cookie)
         pprint.pprint(response.json())
 

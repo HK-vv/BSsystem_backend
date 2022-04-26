@@ -190,7 +190,7 @@ def submit_answer(request, data):
 
 
 @require_user_login
-def record(request, data):
+def result(request, data):
     user = request.user
     contestid = data['contestid']
     try:
