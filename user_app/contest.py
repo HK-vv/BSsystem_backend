@@ -166,8 +166,11 @@ def submit_answer(request, data):
     cid = data['contestid']
     pn = data['problemnum']
     ans = data['user_answer']
-    reg = Registration.objects.get(userid=request.user, contestid_id=cid)
-    if not reg:
+    try:
+        reg = Registration.objects.get(userid=request.user, contestid_id=cid)
+    except Registration.DoesNotExist as rdne:
+        traceback.print_exc()
+        print(rdne.args)
         return msg_response(1, msg=f"您未注册比赛")
 
     r = None
@@ -184,3 +187,67 @@ def submit_answer(request, data):
         return msg_response(0, "Timeout")
     else:
         return msg_response(0, "Success")
+
+
+@require_user_login
+def record(request, data):
+    user = request.user
+    contestid = data['contestid']
+    try:
+        contest = Contest.objects.get(id=contestid)
+        if contest.get_status() in ['upcoming', 'running', 'shut']:
+            return msg_response(1, msg=f'比赛{contestid}未结束')
+
+        reg = Registration.objects.get(userid=user, contestid=contest)
+        problems = contest.get_problems()
+
+        items = []
+
+        for no in problems.keys():
+            problemid = problems[no]['id']
+            item = {
+                'problemno': no,
+                'problemid': problemid,
+                # 'answer': 'A'
+            }
+
+            if Record.objects.filter(userid=user, contestid=contest, problemid=problemid).exists():
+                record = Record.objects.get(userid=user, contestid=contest, problemid__id=problemid)
+                item['correct'] = True if record.result == 'T' else False
+                item['submitted'] = record.submitted
+            else:
+                item['correct'] = False
+                item['submitted'] = None
+
+            if Problem.objects.filter(id=problemid).exists():
+                item['answer'] = Problem.objects.get(id=problemid).answer
+            else:
+                item['answer'] = None
+
+            items.append(item)
+
+    except Contest.DoesNotExist as cdne:
+        traceback.print_exc()
+        print(cdne.args)
+        return msg_response(1, msg=f'比赛{contestid}不存在')
+    except Registration.DoesNotExist as rdne:
+        traceback.print_exc()
+        print(rdne.args)
+        return msg_response(1, msg=f'您未注册比赛')
+    except Record.DoesNotExist as rdne:
+        traceback.print_exc()
+        print(rdne.args)
+        return msg_response(1, msg=f'您未参加比赛')
+    except Exception as e:
+        traceback.print_exc()
+        print(e.args)
+        return msg_response(3)
+
+    return ret_response(0, {'items': items,
+                            'total': len(problems),
+                            'score': reg.score,
+                            'timecost': reg.timecost,
+                            'rank': reg.rank,
+                            'before_rating': reg.beforerating,
+                            'changed_rating': reg.afterrating - reg.beforerating
+                            })
