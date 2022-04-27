@@ -49,8 +49,13 @@ def contest_dispatcher(request):
 @require_admin_login
 def get_contest(request, data):
     contestid = data['contestid']
+    user = request.user
+
     try:
         contest = Contest.objects.get(id=contestid)
+
+        if contest.authorid != user and not user.is_superuser:
+            return msg_response(1, "权限不足")
 
         info = {'contestid': contest.id,
                 'name': contest.name,
