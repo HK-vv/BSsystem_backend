@@ -173,7 +173,6 @@ def submit_answer(request, data):
         print(rdne.args)
         return msg_response(1, msg=f"您未注册比赛")
 
-    r = None
     try:
         with transaction.atomic():
             r = reg.submit_current(ans, pn)
@@ -211,8 +210,8 @@ def result(request, data):
                 # 'answer': 'A'
             }
 
-            if Record.objects.filter(userid=user, contestid=contest, problemid=problemid).exists():
-                record = Record.objects.get(userid=user, contestid=contest, problemid__id=problemid)
+            if Record.objects.filter(userid=user, contestid=contest, problemid_id=problemid).exists():
+                record = Record.objects.get(userid=user, contestid=contest, problemid_id=problemid)
                 item['correct'] = True if record.result == 'T' else False
                 item['submitted'] = record.submitted
             else:

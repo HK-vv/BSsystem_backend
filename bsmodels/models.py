@@ -272,7 +272,7 @@ class Registration(models.Model):
                 print(f"timeout on {nc}th problem ")
             return "timeout"
 
-        Record(reg=self, pno=nc, ans=ans).save()
+        Record.create(reg=self, pno=nc, ans=ans).save()
 
     def get_current_problem(self):
         totn = Contest.objects.get(contestid=self).count_problem()
@@ -292,11 +292,13 @@ class Record(models.Model):
     class Meta:
         unique_together = ("userid", "contestid", "problemid")
 
-    def __init__(self, reg, pno, ans, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.userid = reg.userid
-        self.contestid = reg.contestid
-        self.problemid = ContestProblem.objects.get(contestid=reg.contestid, number=pno).problemid
-        res = self.problemid.iscorrect(ans)
-        self.result = "T" if res else "F"
-        self.submitted = ans
+    @classmethod
+    def create(cls, reg, pno, ans):
+        rec = cls(userid=reg.userid,
+                  contestid=reg.contestid,
+                  problemid=ContestProblem.objects.get(contestid=reg.contestid, number=pno).problemid,
+                  submitted=ans)
+        res = rec.problemid.iscorrect(ans)
+        rec.result = 'T' if res else 'F'
+        return rec
+
