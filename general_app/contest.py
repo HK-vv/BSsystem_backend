@@ -14,21 +14,20 @@ def contest_list(request, data):
     pagesize = int(data['pagesize'])
     pagenum = int(data['pagenum'])
 
-    cur = pytz.UTC.localize(datetime.datetime.now())
-
     lst = Contest.objects.all()
 
     if data.get('type'):
-        type = data['type']
+        type = data['type'].split(' ')
 
-        if type == 'upcoming':
-            lst = lst.filter(start__gt=cur)
-        elif type == 'finished':
-            lst = lst.filter(announced=True)
-        elif type == 'running':
-            lst = lst.filter(Q(end__gt=cur) & Q(start__lte=cur))
-        elif type == 'shut':
-            lst = lst.filter(Q(end__lte=cur) & Q(announced=False))
+        satisfy = []
+        for contest in lst:
+            if contest.get_status() in type:
+                satisfy.append(contest.id)
+        lst = lst.filter(id__in=satisfy)
+
+    if data.get('author'):
+        author = data['author']
+        lst = lst.select_related('authorid').filter(authorid__username__icontains=author)
 
     if data.get('keyword'):
         keyword = data['keyword']
