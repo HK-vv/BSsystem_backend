@@ -49,17 +49,18 @@
 
 ### Contest
 
-| 列名      | 数据类型及精度 | 约束条件                    | 说明             | 备注               |
-| --------- | -------------- | --------------------------- | ---------------- | ------------------ |
-| id        | int            | PRIMARY KEY, AUTO_INCREMENT | 唯一标识         |                    |
-| name      | varchar(30)    | NOT NULL, UNIQUE            | 竞赛名称         |                    |
-| start     | datetime       | NOT NULL                    | 竞赛开始时间     |                    |
-| latest    | datetime       | NOT NULL                    | 最晚进入时间     |                    |
-| end       | date           | NOT NULL                    | 结束时间         |                    |
-| announced | boolean        | DEFAULT(false)              | 是否已经公布成绩 |                    |
-| password  | varchar(30)    |                             | 比赛密码         | 为NULL代表比赛公开 |
-| rated     | boolean        | NOT NULL                    | 是否计分         |                    |
-| authorid  | int            | FOREIGN KEY(Admin(id))      | 作者id           |                    |
+| 列名       | 数据类型及精度 | 约束条件                    | 说明                   | 备注               |
+| ---------- | -------------- | --------------------------- | ---------------------- | ------------------ |
+| id         | int            | PRIMARY KEY, AUTO_INCREMENT | 唯一标识               |                    |
+| name       | varchar(30)    | NOT NULL, UNIQUE            | 竞赛名称               |                    |
+| start      | datetime       | NOT NULL                    | 竞赛开始时间           |                    |
+| latest     | datetime       | NOT NULL                    | 最晚进入时间           |                    |
+| end        | datetime       | NOT NULL                    | 结束时间               |                    |
+| updatetime | datetime       | NOT NULL                    | 最后一次更新排行榜时间 |                    |
+| announced  | boolean        | DEFAULT(false)              | 是否已经公布成绩       |                    |
+| password   | varchar(30)    |                             | 比赛密码               | 为NULL代表比赛公开 |
+| rated      | boolean        | NOT NULL                    | 是否计分               |                    |
+| authorid   | int            | FOREIGN KEY(Admin(id))      | 作者id                 |                    |
 
 ### ContestProblem
 
@@ -86,7 +87,7 @@
 | correct             | int            |                             | 正确数量           |                                                  |
 | timecost            | int            |                             | 总耗时(s)          | 比赛结束后即是$currenttime-starttime$            |
 | score               | int            |                             | 得分               |                                                  |
-| rank                | int            |                             | 排名               |                                                  |
+| rank                | int            | DEFAULT(1)                  | 排名               |                                                  |
 | beforerating        | int            |                             | 更新前rating       |                                                  |
 | afterrating         | int            |                             | 更新后rating       |                                                  |
 
