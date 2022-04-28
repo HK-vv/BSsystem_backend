@@ -72,7 +72,7 @@ def contest_history(request, data):
     items = page.object_list.values()
     temp = list(items)
     items = []
-    print(temp)
+
     for x in temp:
         contestid = x['contestid_id']
         contest = Contest.objects.get(id=contestid)
