@@ -1,11 +1,12 @@
 import datetime
+import traceback
 
 import pytz
 from django.contrib.auth.models import AbstractUser
 from django.db import models, transaction
 from django.db.models import Max, Avg, Min
 
-from brainstorm.settings import OUTPUT_LOG
+from brainstorm.settings import OUTPUT_LOG, UPDATE_INTERVAL
 from utils.auxilary import get_current_time
 
 
@@ -137,8 +138,9 @@ class Contest(models.Model):
     rated = models.BooleanField()
     announced = models.BooleanField(default=False)
     ordered = models.BooleanField(default=False)
+    updatetime = models.DateTimeField(default=pytz.UTC.localize(
+        datetime.datetime.strptime("2022-1-1 00:00:00", '%Y-%m-%d %H:%M:%S')))
     authorid = models.ForeignKey(BSAdmin, on_delete=models.SET_NULL, blank=True, null=True)
-
     # problems = models.ManyToManyField(Problem, through=ContestProblem)
 
     def get_end_time(self):
@@ -172,7 +174,34 @@ class Contest(models.Model):
     def count_problem(self):
         return ContestProblem.objects.filter(contestid=self).count()
 
+    def update_leaderboard(self):
+        cur = pytz.UTC.localize(datetime.datetime.now())
+        if self.announced or cur < self.updatetime + datetime.timedelta(seconds=UPDATE_INTERVAL):
+            return
+        regs = Registration.objects.filter(contestid=self).order_by('-score', 'timecost')
+        try:
+            with transaction.atomic():
+                for i in range(0, len(regs)):
+                    if i == 0:
+                        regs[i].rank = 1
+                    else:
+                        if regs[i].score == regs[i - 1].score and regs[i].timecost == regs[i - 1].timecost:
+                            regs[i].rank = regs[i - 1].rank
+                        else:
+                            regs[i].rank = i + 1
+                    regs[i].save()
+                self.updatetime = max(cur, self.start)
+                self.save()
+                if OUTPUT_LOG:
+                    print(f'比赛{self.id}排行榜已更新')
+        except Exception as e:
+            traceback.print_exc()
+            print(e.args)
+            if OUTPUT_LOG:
+                print(f'比赛{self.id}排行榜更新失败')
+
     def get_leaderboard(self, keyword=None):
+        self.update_leaderboard()
         regs = Registration.objects.filter(contestid=self).order_by('rank')\
             .values('userid_id', 'score', 'timecost', 'correct', 'beforerating', 'afterrating', 'rank')
         if keyword:
@@ -191,6 +220,7 @@ class Contest(models.Model):
 
     def get_user_rank(self, username):
         try:
+            self.update_leaderboard()
             regs = Registration.objects.select_related('userid').filter(contestid=self, userid__username=username)\
                 .values('score', 'timecost', 'correct', 'beforerating', 'afterrating', 'rank')[0]
             regs['changed_rating'] = regs['afterrating'] - regs['beforerating']
@@ -242,7 +272,7 @@ class Registration(models.Model):
     correct = models.IntegerField(null=True)
     timecost = models.IntegerField(null=True)
     score = models.IntegerField(null=True)
-    rank = models.IntegerField(null=True)
+    rank = models.IntegerField(null=True, default=1)
     beforerating = models.IntegerField(null=True)
     afterrating = models.IntegerField(null=True)
 

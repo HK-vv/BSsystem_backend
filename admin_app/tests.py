@@ -114,10 +114,10 @@ class Test(TestCase):
     def test_add_contest(self):
         self.login()
         payload = {
-            "name": "test2029",
-            "start": "2022-04-20 19:00:00",
-            "latest": "2021-04-20 19:10:00",
-            "password": "brainstorm",
+            "name": "testeddie",
+            "start": "2022-04-28 20:10:00",
+            "latest": "2022-04-28 20:30:00",
+            "password": "",
             "rated": True,
             "time_limited": {
                 "single": 30,
@@ -130,7 +130,6 @@ class Test(TestCase):
             ],
             "ordered": False
         }
-        time = pytz.UTC.localize(datetime.strptime('2022-04-19 22:35:00', '%Y-%m-%d %H:%M:%S'))
 
         response = requests.put(f'http://{self.localhost}:{self.port}/api/admin/contest',
                                 cookies=self.cookie, json=payload)
@@ -186,6 +185,6 @@ class Test(TestCase):
     def test_leaderboard(self):
         self.login()
         response = requests.get(f'http://{self.localhost}:{self.port}/api/admin/contest/leaderboard?'
-                                f'contestid=2&pagesize=5&pagenum=1&keyword=bs_1',
+                                f'contestid=2&pagesize=5&pagenum=1',
                                 cookies=self.cookie)
         pprint.pprint(response.json())

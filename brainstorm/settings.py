@@ -130,3 +130,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ATOMIC_REQUESTS = True
 
 OUTPUT_LOG = True
+
+UPDATE_INTERVAL = 10

@@ -92,7 +92,7 @@ class Test(TestCase):
 
     def test_leaderboard(self):
         self.test_login()
-        response = requests.get(f'http://{self.localhost}:{self.port}/api/user/contest/leaderboard?contestid=2',
+        response = requests.get(f'http://{self.localhost}:{self.port}/api/user/contest/leaderboard?contestid=4',
                                 cookies=self.cookie)
         pprint.pprint(response.json())
 
