@@ -2,6 +2,7 @@ from datetime import *
 import random
 
 import pytz
+from django.core.paginator import Paginator
 from django.db import transaction, IntegrityError
 
 from brainstorm.settings import OUTPUT_LOG
@@ -214,3 +215,32 @@ def del_contest(request, data):
         print(f"{user.username} 删除了比赛 {str(contests)}")
 
     return msg_response(0)
+
+
+@require_admin_login
+def leaderboard(request, data):
+    contestid = data['contestid']
+    pagesize = data['pagesize']
+    pagenum = data['pagenum']
+    keyword = data.get('keyword')
+
+    try:
+        contest = Contest.objects.get(id=contestid)
+
+        board = contest.get_leaderboard(keyword)
+        total = len(board)
+
+        score = contest.get_score()
+
+        paginator = Paginator(board, pagesize)
+        page = paginator.page(pagenum)
+        items = page.object_list
+
+        return ret_response(0, {'items': items,
+                                'total': total,
+                                'score': score})
+
+    except Contest.DoesNotExist as cdne:
+        traceback.print_exc()
+        print(cdne.args)
+        return msg_response(1, msg=f'比赛{contestid}不存在')

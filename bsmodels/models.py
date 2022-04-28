@@ -3,6 +3,7 @@ import datetime
 import pytz
 from django.contrib.auth.models import AbstractUser
 from django.db import models, transaction
+from django.db.models import Max, Avg, Min
 
 from brainstorm.settings import OUTPUT_LOG
 from utils.auxilary import get_current_time
@@ -170,6 +171,45 @@ class Contest(models.Model):
 
     def count_problem(self):
         return ContestProblem.objects.filter(contestid=self).count()
+
+    def get_leaderboard(self, keyword=None):
+        regs = Registration.objects.filter(contestid=self).order_by('rank')\
+            .values('userid_id', 'score', 'timecost', 'correct', 'beforerating', 'afterrating', 'rank')
+        if keyword:
+            regs = regs.filter(userid__username__contains=keyword)
+
+        regs = list(regs)
+        for item in regs:
+            item['changed_rating'] = item['afterrating'] - item['beforerating']
+            item['before_rating'] = item['beforerating']
+            del item['beforerating']
+            del item['afterrating']
+
+            item['username'] = BSUser.objects.get(openid=item['userid_id']).username
+            del item['userid_id']
+        return regs
+
+    def get_user_rank(self, username):
+        try:
+            regs = Registration.objects.select_related('userid').filter(contestid=self, userid__username=username)\
+                .values('score', 'timecost', 'correct', 'beforerating', 'afterrating', 'rank')[0]
+            regs['changed_rating'] = regs['afterrating'] - regs['beforerating']
+            regs['before_rating'] = regs['beforerating']
+            del regs['beforerating']
+            del regs['afterrating']
+            regs['username'] = username
+            return regs
+        except:
+            return None
+
+    def get_score(self):
+        regs = Registration.objects.filter(contestid=self)
+        score = {
+            'highest': regs.aggregate(Max('score'))['score__max'],
+            'average': regs.aggregate(Avg('score'))['score__avg'],
+            'lowest': regs.aggregate(Min('score'))['score__min'],
+        }
+        return score
 
 
 class ContestProblem(models.Model):

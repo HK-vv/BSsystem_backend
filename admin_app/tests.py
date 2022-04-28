@@ -182,3 +182,10 @@ class Test(TestCase):
         response = requests.get(f'http://{self.localhost}:{self.port}/api/admin/problem/detail?problemid=225',
                                 cookies=self.cookie)
         pprint.pprint(response.json())
+
+    def test_leaderboard(self):
+        self.login()
+        response = requests.get(f'http://{self.localhost}:{self.port}/api/admin/contest/leaderboard?'
+                                f'contestid=2&pagesize=5&pagenum=1&keyword=bs_1',
+                                cookies=self.cookie)
+        pprint.pprint(response.json())

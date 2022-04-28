@@ -14,4 +14,5 @@ urlpatterns = [
     path('contest/problem', contest.get_problem),
     path('contest/submit', contest.submit_answer),
     path('contest/result', contest.result),
+    path('contest/leaderboard', contest.leaderboard),
 ]

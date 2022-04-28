@@ -250,3 +250,28 @@ def result(request, data):
                             'before_rating': reg.beforerating,
                             'changed_rating': reg.afterrating - reg.beforerating
                             })
+
+
+@require_user_login
+def leaderboard(request, data):
+    contestid = data['contestid']
+    user = request.user
+    try:
+        contest = Contest.objects.get(id=contestid)
+        if contest.get_status() != 'finished':
+            return msg_response(1, msg=f'比赛{contestid}未结束')
+
+        board = contest.get_leaderboard()
+        top3 = board[:3]
+
+        user_rank = contest.get_user_rank(user.username)
+        if user_rank is None:
+            return ret_response(0, {'top3': top3})
+
+        return ret_response(0, {'top3': top3,
+                                'user_rank': user_rank})
+
+    except Contest.DoesNotExist as cdne:
+        traceback.print_exc()
+        print(cdne.args)
+        return msg_response(1, msg=f'比赛{contestid}不存在')
