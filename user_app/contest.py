@@ -91,7 +91,8 @@ def contest_history(request, data):
                 "binary": 0,
                 "completion": 0
             },
-            'author': contest.authorid.username
+            'author': contest.authorid.username,
+            'total_number': contest.count_problem()
         }
 
         contest_problem = ContestProblem.objects.filter(contestid=contest).order_by('number')

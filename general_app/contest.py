@@ -59,7 +59,8 @@ def contest_list(request, data):
                 "binary": 0,
                 "completion": 0
             },
-            'author': contest.authorid.username
+            'author': contest.authorid.username,
+            'total_number': contest.count_problem()
         }
 
         if request.session.get('openid'):
