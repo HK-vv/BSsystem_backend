@@ -11,8 +11,8 @@ urlpatterns = [
     path('contest/register', contest.register),
     path('contest/records', contest.contest_history),
     path('contest/start', contest.start),
-    path('contest/problem/submit', contest.get_problem),
-    path('contest/submit', contest.submit_answer),
+    path('contest/problem', contest.get_problem),
+    path('contest/problem/submit', contest.submit_answer),
     path('contest/result', contest.result),
     path('contest/leaderboard', contest.leaderboard),
 ]
