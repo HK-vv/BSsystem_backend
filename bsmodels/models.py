@@ -324,7 +324,7 @@ class Registration(models.Model):
 
             # update two pointers at the same time
             self.currentnumber = tar
-            self.currenttime = t - (ps[k]['dt'] - tardt)
+            self.currenttime = t - (timedelta(ps[tar]['dt']) - tardt)
         else:
             self.currentnumber = totn + 1
             self.currenttime = t
