@@ -348,7 +348,7 @@ class Registration(models.Model):
         totn = self.contestid.count_problem()
         t = get_current_time()
         if 0 < self.currentnumber <= totn:
-            ct = ContestProblem.objects.get(contestid=self, number=self.currentnumber)
+            ct = ContestProblem.objects.get(contestid=self.contestid, number=self.currentnumber)
             return ct.problemid, self.currentnumber, (ct.duration - (t - self.currenttime)).total_seconds()
 
 
