@@ -179,7 +179,7 @@ def submit_answer(request, data):
             r = reg.submit_current(ans, pn)
             reg.next_problem()
     except Exception as e:
-        if isinstance(e.args[0], str):
+        if isinstance(e.args[0], str) and e.args[0] == "wrong problem to answer":
             return msg_response(1, e.args[0])
         raise e
 
