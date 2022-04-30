@@ -351,7 +351,7 @@ class Registration(models.Model):
         if 0 < self.currentnumber <= totn:
             ct = ContestProblem.objects.get(contestid=self.contestid, number=self.currentnumber)
             return ct.problemid, self.currentnumber, \
-                   (datetime.timedelta(ct.duration) - (t - self.currenttime)).total_seconds()
+                   (datetime.timedelta(seconds=ct.duration) - (t - self.currenttime)).total_seconds()
 
 
 class Record(models.Model):
