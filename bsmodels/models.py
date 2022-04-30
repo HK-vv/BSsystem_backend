@@ -1,4 +1,5 @@
 import datetime
+from datetime import timedelta
 import traceback
 
 import pytz
@@ -150,7 +151,7 @@ class Contest(models.Model):
         for problem in problems:
             max_time += problem.duration
 
-        return self.latest + datetime.timedelta(seconds=max_time)
+        return self.latest + timedelta(seconds=max_time)
 
     def get_status(self):
         cur = pytz.UTC.localize(datetime.datetime.now())
@@ -177,7 +178,7 @@ class Contest(models.Model):
 
     def update_leaderboard(self):
         cur = pytz.UTC.localize(datetime.datetime.now())
-        if self.announced or cur < self.updatetime + datetime.timedelta(seconds=UPDATE_INTERVAL):
+        if self.announced or cur < self.updatetime + timedelta(seconds=UPDATE_INTERVAL):
             return
         regs = Registration.objects.filter(contestid=self).order_by('-score', 'timecost')
         try:
@@ -306,20 +307,20 @@ class Registration(models.Model):
         if nc > totn:
             return
         t = get_current_time()
-        sm = datetime.timedelta(seconds=0)
+        sm = timedelta(seconds=0)
         k = nc
         while k <= totn:
-            if sm <= t - tc < sm + datetime.timedelta(seconds=ps[k]['dt']):
+            if sm <= t - tc < sm + timedelta(seconds=ps[k]['dt']):
                 break
-            sm += datetime.timedelta(seconds=ps[k]['dt'])
+            sm += timedelta(seconds=ps[k]['dt'])
             k += 1
         tar = max(k, nc + 1)
         if tar <= totn:
-            sm = datetime.timedelta(seconds=0)
+            sm = timedelta(seconds=0)
             for k in range(nc, tar + 1):
-                sm += datetime.timedelta(seconds=ps[k]['dt'])
-            tardt = min(sm - (t - tc), ps[tar]['dt'])
-            assert tardt > datetime.timedelta(seconds=0)
+                sm += timedelta(seconds=ps[k]['dt'])
+            tardt = min(sm - (t - tc), timedelta(ps[tar]['dt']))
+            assert tardt > timedelta(seconds=0)
 
             # update two pointers at the same time
             self.currentnumber = tar
@@ -338,7 +339,7 @@ class Registration(models.Model):
 
         if check_pn and check_pn != nc:
             raise Exception("wrong problem to answer")
-        if t - tc > datetime.timedelta(seconds=ps[nc]['dt']):
+        if t - tc > timedelta(seconds=ps[nc]['dt']):
             if OUTPUT_LOG:
                 print(f"timeout on {nc}th problem ")
             return "timeout"
@@ -351,7 +352,7 @@ class Registration(models.Model):
         if 0 < self.currentnumber <= totn:
             ct = ContestProblem.objects.get(contestid=self.contestid, number=self.currentnumber)
             return ct.problemid, self.currentnumber, \
-                   (datetime.timedelta(seconds=ct.duration) - (t - self.currenttime)).total_seconds()
+                   (timedelta(seconds=ct.duration) - (t - self.currenttime)).total_seconds()
 
 
 class Record(models.Model):
