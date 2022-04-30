@@ -50,7 +50,7 @@ def session_expired(request, keyword):
 # Notice: It would lead to UB if `mp` is overlap.
 def dict_list_decorator(ori: list, mp: dict) -> list:
     for x in ori:
-        for a, b in mp:
+        for a, b in mp.values():
             x[b] = x.pop(a)
     return ori
 
