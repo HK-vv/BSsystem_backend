@@ -141,6 +141,7 @@ class Contest(models.Model):
     updatetime = models.DateTimeField(default=pytz.UTC.localize(
         datetime.datetime.strptime("2022-1-1 00:00:00", '%Y-%m-%d %H:%M:%S')))
     authorid = models.ForeignKey(BSAdmin, on_delete=models.SET_NULL, blank=True, null=True)
+
     # problems = models.ManyToManyField(Problem, through=ContestProblem)
 
     def get_end_time(self):
@@ -202,7 +203,7 @@ class Contest(models.Model):
 
     def get_leaderboard(self, keyword=None):
         self.update_leaderboard()
-        regs = Registration.objects.filter(contestid=self).order_by('rank')\
+        regs = Registration.objects.filter(contestid=self).order_by('rank') \
             .values('userid_id', 'score', 'timecost', 'correct', 'beforerating', 'afterrating', 'rank')
         if keyword:
             regs = regs.filter(userid__username__contains=keyword)
@@ -221,7 +222,7 @@ class Contest(models.Model):
     def get_user_rank(self, username):
         try:
             self.update_leaderboard()
-            regs = Registration.objects.select_related('userid').filter(contestid=self, userid__username=username)\
+            regs = Registration.objects.select_related('userid').filter(contestid=self, userid__username=username) \
                 .values('score', 'timecost', 'correct', 'beforerating', 'afterrating', 'rank')[0]
             regs['changed_rating'] = regs['afterrating'] - regs['beforerating']
             regs['before_rating'] = regs['beforerating']
@@ -349,7 +350,8 @@ class Registration(models.Model):
         t = get_current_time()
         if 0 < self.currentnumber <= totn:
             ct = ContestProblem.objects.get(contestid=self.contestid, number=self.currentnumber)
-            return ct.problemid, self.currentnumber, (ct.duration - (t - self.currenttime)).total_seconds()
+            return ct.problemid, self.currentnumber, \
+                   (datetime.timedelta(ct.duration) - (t - self.currenttime)).total_seconds()
 
 
 class Record(models.Model):
@@ -371,4 +373,3 @@ class Record(models.Model):
         res = rec.problemid.iscorrect(ans)
         rec.result = 'T' if res else 'F'
         return rec
-
