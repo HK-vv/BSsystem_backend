@@ -52,9 +52,9 @@ def data2problem(data, user):
                 # 将too_long列表的字符连接，并用顿号分隔
                 errs = "、".join(too_long)
                 raise Exception(f"{errs}过长")
-
-            if answer not in ['A', 'B', 'C', 'D']:
-                raise Exception("答案错误")
+            for char in answer:
+                if char not in ['A', 'B', 'C', 'D']:
+                    raise Exception("答案错误")
             problem.A = A
             problem.B = B
             problem.C = C

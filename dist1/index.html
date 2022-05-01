@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/cdnjs/jquery/3.5.0/jquery.min.js"></script>
+    <script src="/cdnjs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+    头像<input type="file" name="touxiang" id="file">
+    <br>
+    <label for="name">用户名</label>
+    <input type="text" id="name" name="username">
+    <input type = "button" value= "提交" onclick = report() >
+
+</body>
+<script>
+    function report()
+    {
+        var formdata = new FormData();
+        tags=['安全知识']
+        formdata.append('tags',tags);
+        formdata.append('file',$('#file')[0].files[0]);
+        $.ajax({
+            'url':'api/admin/problem/batch/add',
+            'type':'post',
+            'data':formdata,
+            processData:false,
+            contentType: false,
+            success:function (res) {
+                console.log(res)
+            }
+        })
+     }
+</script>
+</html>
