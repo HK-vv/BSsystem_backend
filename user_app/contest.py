@@ -154,7 +154,7 @@ def get_problem(request, data):
     try:
         problem, nc, dt = reg.get_current_problem()
     except ContestFinishedError:
-        return ret_response(1, "finished already")
+        return msg_response(1, "finished already")
 
     fp = {
         'type': problem.type,
