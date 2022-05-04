@@ -134,10 +134,11 @@ def start(request, data):
         return msg_response(1, msg=f'比赛{contestid}已结束')
 
     try:
-        Registration.objects.get(userid=user, contestid=contest).start()
+        reg = Registration.objects.get(userid=user, contestid=contest)
+        reg.start()
         total = ContestProblem.objects.filter(contestid=contest).count()
-
-        return ret_response(0, {'total': total})
+        finished = reg.currentnumber > total
+        return ret_response(0, {'total': total, 'finished': finished})
     except Registration.DoesNotExist as rdne:
         traceback.print_exc()
         print(rdne.args)

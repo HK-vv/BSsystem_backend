@@ -73,7 +73,7 @@ def get_contest(request, data):
                 },
                 'author': contest.authorid.username}
 
-        contest_problem = ContestProblem.objects.filter(contestid=contest)\
+        contest_problem = ContestProblem.objects.filter(contestid=contest) \
             .exclude(problemid__isnull=True).order_by('number')
         problems = list(contest_problem.values('problemid', 'duration'))
         # print(problems)
@@ -244,3 +244,11 @@ def leaderboard(request, data):
         traceback.print_exc()
         print(cdne.args)
         return msg_response(1, msg=f'比赛{contestid}不存在')
+
+
+@require_admin_login
+def announce(request, data):
+    cid = data['contestid']
+    rated = data['rated']
+    
+    pass
