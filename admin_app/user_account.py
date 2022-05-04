@@ -88,4 +88,4 @@ def user_contest_result(request, data):
                       'submitted': rec.submitted,
                       'answer': problem.answer})
 
-    return ret_response(0, {'items': items})
+    return ret_response(0, {'items': items, 'total': tot})
