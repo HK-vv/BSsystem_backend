@@ -1,4 +1,4 @@
-from utils.auxilary import msg_response
+from utils.auxiliary import msg_response
 
 '''
 method2handler_table 写法:

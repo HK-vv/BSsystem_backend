@@ -1,5 +1,5 @@
 from brainstorm.settings import OUTPUT_LOG
-from utils.auxilary import output_request_info
+from utils.auxiliary import output_request_info
 
 
 class OutputRequestInformationMiddleware:

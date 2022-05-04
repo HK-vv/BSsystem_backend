@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from django.db.models import Q, F, QuerySet
 
 from bsmodels.models import Contest, ContestProblem, Problem, Registration
-from utils.auxilary import ret_response
+from utils.auxiliary import ret_response
 from utils.decorators import require_nothing
 
 

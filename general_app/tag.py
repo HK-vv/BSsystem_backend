@@ -1,5 +1,5 @@
 from bsmodels.models import Tag
-from utils.auxilary import ret_response
+from utils.auxiliary import ret_response
 from utils.decorators import require_nothing
 
 

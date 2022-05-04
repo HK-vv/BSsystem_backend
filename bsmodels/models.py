@@ -8,7 +8,7 @@ from django.db import models, transaction
 from django.db.models import Max, Avg, Min
 
 from brainstorm.settings import OUTPUT_LOG, UPDATE_INTERVAL
-from utils.auxilary import get_current_time
+from utils.auxiliary import get_current_time
 from utils.exceptions import SubmitWrongProblemError, ContestFinishedError
 
 
@@ -246,14 +246,21 @@ class Contest(models.Model):
         }
         return score
 
-    def annouce(self):
+    def annouce(self, rated):
         if self.announced:
             return
+        if rated and not self.rated:
+            raise Exception("could not rate the unrated contest")
         with transaction.atomic():
             self.announced = True
-            # TODO: update all
+            if rated:
+                self.__update_rating()
+                pass
             self.save()
 
+    def __update_rating(self):
+        # TODO: maybe most logical work in auxiliary?
+        pass
 
 class ContestProblem(models.Model):
     contestid = models.ForeignKey(Contest, on_delete=models.SET_NULL, blank=True, null=True)

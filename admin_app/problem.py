@@ -7,7 +7,7 @@ from utils.decorators import *
 from brainstorm import settings
 import os
 import pandas as pd
-from utils.auxilary import *
+from utils.auxiliary import *
 import openpyxl
 from bsmodels.models import Problem
 from bsmodels.models import Tag

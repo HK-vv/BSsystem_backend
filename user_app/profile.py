@@ -1,5 +1,5 @@
 from brainstorm.settings import OUTPUT_LOG
-from utils.auxilary import *
+from utils.auxiliary import *
 from utils.handler import *
 from bsmodels.models import BSUser
 from utils.decorators import *

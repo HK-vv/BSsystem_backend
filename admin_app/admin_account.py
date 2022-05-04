@@ -5,7 +5,7 @@ from django.db.models.functions import Lower
 from django.http import JsonResponse
 from brainstorm.settings import OUTPUT_LOG
 from bsmodels.models import BSAdmin
-from utils.auxilary import msg_response, ret_response
+from utils.auxiliary import msg_response, ret_response
 from utils.decorators import require_admin_login, require_super_login
 from utils.handler import dispatcher_base
 

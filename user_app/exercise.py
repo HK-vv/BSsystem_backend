@@ -1,7 +1,7 @@
 from django.db.models import Q
 
 from brainstorm.settings import OUTPUT_LOG
-from utils.auxilary import *
+from utils.auxiliary import *
 from utils.decorators import *
 from bsmodels.models import Tag, BSUser, Problem
 from bsmodels.models import ProblemTag

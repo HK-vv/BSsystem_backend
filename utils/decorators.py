@@ -2,7 +2,7 @@ import traceback
 from functools import wraps
 
 from bsmodels.models import BSUser
-from utils.auxilary import msg_response, get_data, session_expired, output_request_info
+from utils.auxiliary import msg_response, get_data, session_expired, output_request_info
 
 
 def require_nothing(func):

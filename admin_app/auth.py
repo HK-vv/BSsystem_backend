@@ -4,7 +4,7 @@ from django.contrib.auth import login, authenticate, logout
 
 from brainstorm.settings import OUTPUT_LOG
 from bsmodels.models import BSAdmin
-from utils.auxilary import msg_response
+from utils.auxiliary import msg_response
 from utils.decorators import *
 
 

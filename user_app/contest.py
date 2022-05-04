@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from django.db import transaction
 
 from bsmodels.models import Contest, BSUser, Registration, ContestProblem, Problem, Record
-from utils.auxilary import msg_response, ret_response, get_current_time
+from utils.auxiliary import msg_response, ret_response, get_current_time
 from utils.decorators import require_user_login
 from utils.exceptions import SubmitWrongProblemError, ContestFinishedError
 

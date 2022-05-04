@@ -7,7 +7,7 @@ from django.db import transaction, IntegrityError
 
 from brainstorm.settings import OUTPUT_LOG
 from bsmodels.models import Contest, Problem, ContestProblem
-from utils.auxilary import ret_response
+from utils.auxiliary import ret_response
 from utils.decorators import *
 from utils.handler import dispatcher_base
 
@@ -255,9 +255,10 @@ def announce(request, data):
         contest = Contest.objects.get(id=cid)
     except Contest.DoesNotExist:
         return msg_response(1, "比赛不存在")
+
     if contest.authorid != request.user and not request.user.is_superuser:
         return msg_response(1, "权限不足")
 
-    contest.annouce()
+    contest.annouce(rated)
 
     return msg_response(0)

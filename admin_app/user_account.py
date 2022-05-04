@@ -2,7 +2,7 @@ from django.core.paginator import Paginator
 from django.db.models import Count
 
 from bsmodels.models import BSUser, Contest, Registration
-from utils.auxilary import ret_response, dict_list_decorator
+from utils.auxiliary import ret_response, dict_list_decorator
 from utils.decorators import require_admin_login
 
 

@@ -4,7 +4,7 @@ import random
 from brainstorm.settings import APPID, OUTPUT_LOG
 from brainstorm.settings import SECRET
 from utils.decorators import *
-from utils.auxilary import *
+from utils.auxiliary import *
 from bsmodels.models import BSUser
 
 DEBUG = False
