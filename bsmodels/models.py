@@ -320,12 +320,12 @@ class Registration(models.Model):
             sm = timedelta(seconds=0)
             for k in range(nc, tar + 1):
                 sm += timedelta(seconds=ps[k]['dt'])
-            tardt = min(sm - (t - tc), timedelta(ps[tar]['dt']))
+            tardt = min(sm - (t - tc), timedelta(seconds=ps[tar]['dt']))
             assert tardt > timedelta(seconds=0)
 
             # update two pointers at the same time
             self.currentnumber = tar
-            self.currenttime = t - (timedelta(ps[tar]['dt']) - tardt)
+            self.currenttime = t - (timedelta(seconds=ps[tar]['dt']) - tardt)
         else:
             self.currentnumber = totn + 1
             self.currenttime = t
