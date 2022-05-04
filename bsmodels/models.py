@@ -9,6 +9,7 @@ from django.db.models import Max, Avg, Min
 
 from brainstorm.settings import OUTPUT_LOG, UPDATE_INTERVAL
 from utils.auxilary import get_current_time
+from utils.exceptions import SubmitWrongProblemError, ContestFinishedError
 
 
 class BSUser(models.Model):
@@ -338,7 +339,7 @@ class Registration(models.Model):
         t = get_current_time()
 
         if check_pn and check_pn != nc:
-            raise Exception("wrong problem to answer")
+            raise SubmitWrongProblemError(f"submit {check_pn} to {nc}")
         if t - tc > timedelta(seconds=ps[nc]['dt']):
             if OUTPUT_LOG:
                 print(f"timeout on {nc}th problem ")
@@ -353,6 +354,8 @@ class Registration(models.Model):
             ct = ContestProblem.objects.get(contestid=self.contestid, number=self.currentnumber)
             return ct.problemid, self.currentnumber, \
                    (timedelta(seconds=ct.duration) - (t - self.currenttime)).total_seconds()
+        else:
+            raise ContestFinishedError("It's already finished")
 
 
 class Record(models.Model):

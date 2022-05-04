@@ -7,6 +7,7 @@ from django.db import transaction
 from bsmodels.models import Contest, BSUser, Registration, ContestProblem, Problem, Record
 from utils.auxilary import msg_response, ret_response, get_current_time
 from utils.decorators import require_user_login
+from utils.exceptions import SubmitWrongProblemError, ContestFinishedError
 
 
 @require_user_login
@@ -150,7 +151,11 @@ def get_problem(request, data):
     if not reg:
         return msg_response(1, msg=f"您未注册比赛")
 
-    problem, nc, dt = reg.get_current_problem()
+    try:
+        problem, nc, dt = reg.get_current_problem()
+    except ContestFinishedError:
+        return ret_response(1, "finished already")
+
     fp = {
         'type': problem.type,
         'description': problem.description,
@@ -178,10 +183,8 @@ def submit_answer(request, data):
         with transaction.atomic():
             r = reg.submit_current(ans, pn)
             reg.next_problem()
-    except Exception as e:
-        if isinstance(e.args[0], str) and e.args[0] == "wrong problem to answer":
-            return msg_response(1, e.args[0])
-        raise e
+    except SubmitWrongProblemError as e:
+        return msg_response(1, e.args[0])
 
     if r == "timeout":
         return msg_response(0, "Timeout")
