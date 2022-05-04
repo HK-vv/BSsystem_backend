@@ -20,5 +20,6 @@ urlpatterns = [
     path('problem/batch/delete', problem.del_problem),
     path('contest', contest.contest_dispatcher),
     path('contest/batch/delete', contest.del_contest),
+    path('contest/calculate', contest.announce),
     path('contest/leaderboard', contest.leaderboard),
 ]
