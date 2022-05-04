@@ -262,6 +262,7 @@ class Contest(models.Model):
         # TODO: maybe most logical work in auxiliary?
         pass
 
+
 class ContestProblem(models.Model):
     contestid = models.ForeignKey(Contest, on_delete=models.SET_NULL, blank=True, null=True)
     problemid = models.ForeignKey(Problem, on_delete=models.SET_NULL, blank=True, null=True)
@@ -376,21 +377,25 @@ class Registration(models.Model):
 
 
 class Record(models.Model):
-    userid = models.ForeignKey(BSUser, on_delete=models.SET_NULL, blank=True, null=True)
-    contestid = models.ForeignKey(Contest, on_delete=models.SET_NULL, blank=True, null=True)
-    problemid = models.ForeignKey(Problem, on_delete=models.SET_NULL, blank=True, null=True)
+    registerid = models.ForeignKey(Registration, on_delete=models.CASCADE)
+    problemno = models.IntegerField()
     result = models.CharField(max_length=10, choices=[("T", "right"), ("F", "wrong")])
     submitted = models.CharField(max_length=100, null=True)
 
     class Meta:
-        unique_together = ("userid", "contestid", "problemid")
+        unique_together = ("registerid", "problemno")
 
     @classmethod
     def create(cls, reg, pno, ans):
-        rec = cls(userid=reg.userid,
-                  contestid=reg.contestid,
-                  problemid=ContestProblem.objects.get(contestid=reg.contestid, number=pno).problemid,
+        rec = cls(registerid=reg,
+                  problemno=pno,
                   submitted=ans)
-        res = rec.problemid.iscorrect(ans)
+        problem = Problem.objects.get(contestproblem__contestid=reg.contestid,
+                                      contestproblem__number=pno)
+        res = problem.iscorrect(ans)
         rec.result = 'T' if res else 'F'
         return rec
+
+    def get_problem(self):
+        return Problem.objects.get(contestproblem__contestid=self.registerid.contestid,
+                                   contestproblem__number=self.problemno)

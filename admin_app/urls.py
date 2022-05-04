@@ -12,6 +12,7 @@ urlpatterns = [
     path('admin_account/integrity_verification', admin_account.integrity_verification),
     path('user_account/list', user_account.user_list),
     path('user_account/contest/history', user_account.user_contest_history),
+    path('user_account/contest/result', user_account.user_contest_result),
     path('tag', tag.tag_dispatcher),
     path('problem', problem.problem_dispatcher),
     path('problem/detail', problem.problem_detail),

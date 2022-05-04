@@ -215,8 +215,8 @@ def result(request, data):
                 # 'answer': 'A'
             }
 
-            if Record.objects.filter(userid=user, contestid=contest, problemid_id=problemid).exists():
-                record = Record.objects.get(userid=user, contestid=contest, problemid_id=problemid)
+            if Record.objects.filter(registerid=reg, problemno=no).exists():
+                record = Record.objects.get(registerid=reg, problemno=no)
                 item['correct'] = True if record.result == 'T' else False
                 item['submitted'] = record.submitted
             else:
