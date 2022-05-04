@@ -378,7 +378,7 @@ class Registration(models.Model):
 
 class Record(models.Model):
     registerid = models.ForeignKey(Registration, on_delete=models.CASCADE)
-    problemno = models.IntegerField()
+    problemno = models.IntegerField(null=True)
     result = models.CharField(max_length=10, choices=[("T", "right"), ("F", "wrong")])
     submitted = models.CharField(max_length=100, null=True)
 
