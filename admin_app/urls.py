@@ -23,4 +23,5 @@ urlpatterns = [
     path('contest/batch/delete', contest.del_contest),
     path('contest/calculate', contest.announce),
     path('contest/leaderboard', contest.leaderboard),
+    path('contest/statistics', contest.statistics),
 ]

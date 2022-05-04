@@ -188,3 +188,9 @@ class Test(TestCase):
                                 f'contestid=2&pagesize=5&pagenum=1',
                                 cookies=self.cookie)
         pprint.pprint(response.json())
+
+    def test_statistics(self):
+        self.login()
+        response = requests.get(f'http://{self.localhost}:{self.port}/api/admin/contest/statistics?contestid=2',
+                                cookies=self.cookie)
+        pprint.pprint(response.json())

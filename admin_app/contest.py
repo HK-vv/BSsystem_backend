@@ -262,3 +262,17 @@ def announce(request, data):
     contest.annouce(rated)
 
     return msg_response(0)
+
+
+@require_admin_login
+def statistics(request, data):
+    contestid = data['contestid']
+
+    try:
+        contest = Contest.objects.get(id=contestid)
+        return ret_response(0, contest.statistics())
+
+    except Contest.DoesNotExist as cdne:
+        traceback.print_exc()
+        print(cdne.args)
+        return msg_response(1, "比赛不存在")

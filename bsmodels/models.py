@@ -262,6 +262,45 @@ class Contest(models.Model):
         # TODO: maybe most logical work in auxiliary?
         pass
 
+    def statistics(self):
+        prob = self.get_problems()
+        regs = Registration.objects.filter(contestid=self)
+        records = Record.objects.filter(registerid__in=regs)
+
+        problems = []
+        for pno in prob.keys():
+            rec = records.filter(problemno=pno)
+
+            item = {
+                'problemno': pno,
+                'correct': rec.filter(result='T').count(),
+                'all': rec.count(),
+            }
+            problems.append(item)
+
+        total = len(problems)
+
+        max_score = 100
+        min_score = 0
+        sections = []
+
+        for section in range(10):
+            l = min_score + section * max_score / 10.0
+            r = min_score + (section + 1) * max_score / 10.0
+            if section == 0:
+                sections.append(regs.filter(score__gte=l, score__lte=r).count())
+            else:
+                sections.append(regs.filter(score__gt=l, score__lte=r).count())
+
+        return {
+            'problems': problems,
+            'total': total,
+            'sections': sections,
+            'average_score': self.get_score()['average'],
+            'registrants': regs.count(),
+            'participants': records.values('registerid').distinct().count(),
+        }
+
 
 class ContestProblem(models.Model):
     contestid = models.ForeignKey(Contest, on_delete=models.SET_NULL, blank=True, null=True)
