@@ -232,7 +232,9 @@ class Contest(models.Model):
             del regs['afterrating']
             regs['username'] = username
             return regs
-        except:
+        except Exception as e:
+            traceback.print_exc()
+            print(e.args)
             return None
 
     def get_score(self):
@@ -243,6 +245,14 @@ class Contest(models.Model):
             'lowest': regs.aggregate(Min('score'))['score__min'],
         }
         return score
+
+    def annouce(self):
+        if self.announced:
+            return
+        with transaction.atomic():
+            self.announced = True
+            # TODO: update all
+            self.save()
 
 
 class ContestProblem(models.Model):

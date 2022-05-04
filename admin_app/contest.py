@@ -250,5 +250,14 @@ def leaderboard(request, data):
 def announce(request, data):
     cid = data['contestid']
     rated = data['rated']
-    
-    pass
+
+    try:
+        contest = Contest.objects.get(id=cid)
+    except Contest.DoesNotExist:
+        return msg_response(1, "比赛不存在")
+    if contest.authorid != request.user and not request.user.is_superuser:
+        return msg_response(1, "权限不足")
+
+    contest.annouce()
+
+    return msg_response(0)
