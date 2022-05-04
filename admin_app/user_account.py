@@ -70,7 +70,6 @@ def user_contest_result(request, data):
         user = BSUser.objects.get(username=username)
         reg = Registration.objects.get(userid=user, contestid=contest)
     except Exception as e:
-        traceback.print_exc()
         print(e.args)
         return msg_response(1, "something doesn't exist")
 
