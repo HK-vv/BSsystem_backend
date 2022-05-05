@@ -136,6 +136,7 @@ def start(request, data):
     try:
         reg = Registration.objects.get(userid=user, contestid=contest)
         reg.start()
+        reg.update_score()
         total = ContestProblem.objects.filter(contestid=contest).count()
         finished = reg.currentnumber > total
         return ret_response(0, {'total': total, 'finished': finished})

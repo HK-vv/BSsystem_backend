@@ -471,6 +471,7 @@ class Registration(models.Model):
         if t != 0:
             s = rp ** 2 * tp / t
         self.score = f(s)
+        self.save()
         if OUTPUT_LOG:
             print(f"score updated to {self.score}")
 
