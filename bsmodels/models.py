@@ -213,7 +213,7 @@ class Contest(models.Model):
 
         regs = list(regs)
         for item in regs:
-            user =  BSUser.objects.get(openid=item['userid_id'])
+            user = BSUser.objects.get(openid=item['userid_id'])
 
             if item['afterrating'] is not None and item['beforerating'] is not None:
                 item['changed_rating'] = item['afterrating'] - item['beforerating']
@@ -466,8 +466,10 @@ class Registration(models.Model):
                 tp += ContestProblem.objects.get(number=i, contestid=self.contestid).duration
         rp = p / tot
         t = (self.currenttime - self.starttime).total_seconds()
-        s = rp ** 2 * tp / t
-        return f(s)
+        s = 0
+        if t != 0:
+            s = rp ** 2 * tp / t
+        self.score = f(s)
 
 
 class Record(models.Model):

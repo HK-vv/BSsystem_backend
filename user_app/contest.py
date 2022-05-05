@@ -242,10 +242,6 @@ def result(request, data):
         traceback.print_exc()
         print(rdne.args)
         return msg_response(1, msg=f'您未参加比赛')
-    except Exception as e:
-        traceback.print_exc()
-        print(e.args)
-        return msg_response(3)
 
     return ret_response(0, {'items': items,
                             'total': len(problems),
