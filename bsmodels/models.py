@@ -311,8 +311,8 @@ class Contest(models.Model):
 
 
 class ContestProblem(models.Model):
-    contestid = models.ForeignKey(Contest, on_delete=models.SET_NULL, blank=True, null=True)
-    problemid = models.ForeignKey(Problem, on_delete=models.SET_NULL, blank=True, null=True)
+    contestid = models.ForeignKey(Contest, on_delete=models.CASCADE, blank=True, null=True)
+    problemid = models.ForeignKey(Problem, on_delete=models.PROTECT, blank=True, null=True)
     number = models.IntegerField()
     duration = models.IntegerField()
 
