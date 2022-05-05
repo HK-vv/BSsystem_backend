@@ -428,7 +428,7 @@ class Registration(models.Model):
             rec = Record.objects.get(registerid=self, problemno=pno)
         except Record.DoesNotExist:
             rec = None
-        pid = ContestProblem.objects.get(contestid=self.contestid, number=pno).problemid
+        pid = ContestProblem.objects.get(contestid=self.contestid, number=pno).problemid_id
         d = {}
         if rec:
             if rec.submitted == "":
