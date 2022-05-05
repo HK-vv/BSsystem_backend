@@ -243,6 +243,7 @@ def leaderboard(request, data):
 
         return ret_response(0, {'items': items,
                                 'total': total,
+                                'problem_total': contest.count_problem(),
                                 'score': score})
 
     except Contest.DoesNotExist as cdne:
