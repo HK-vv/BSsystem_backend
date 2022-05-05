@@ -6,7 +6,7 @@ from django.core.paginator import Paginator
 from django.db import transaction, IntegrityError
 
 from brainstorm.settings import OUTPUT_LOG
-from bsmodels.models import Contest, Problem, ContestProblem
+from bsmodels.models import Contest, Problem, ContestProblem, Registration
 from utils.auxiliary import ret_response
 from utils.decorators import *
 from utils.handler import dispatcher_base
@@ -235,6 +235,10 @@ def leaderboard(request, data):
         paginator = Paginator(board, pagesize)
         page = paginator.page(pagenum)
         items = page.object_list
+
+        for d in items:
+            reg = Registration.objects.get(userid__username=d['username'], contestid=contest)
+            d['answer_case'] = reg.get_answer_statuses()
 
         return ret_response(0, {'items': items,
                                 'total': total,

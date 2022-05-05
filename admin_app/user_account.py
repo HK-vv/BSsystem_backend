@@ -76,23 +76,11 @@ def user_contest_result(request, data):
     tot = contest.count_problem()
     items = []
     for i in range(1, tot + 1):
-        status = 'miss'
-        if Record.objects.filter(registerid=reg, problemno=i).exists():
-            rec = Record.objects.get(registerid=reg, problemno=i)
-            status = 'valid'
-            if rec.submitted == "":
-                status = 'timeout'
-                rec = None
-
         problem = Problem.objects.get(contestproblem__contestid=reg.contestid,
                                       contestproblem__number=i)
         item = {'problemno': i,
                 'problemid': problem.id,
-                'status': status,
                 'answer': problem.answer}
-        if status == 'valid':
-            item['correct'] = rec.result == 'T'
-            item['submitted'] = rec.submitted
-        items.append(item)
+        item.update(reg.get_answer_status(i))
 
     return ret_response(0, {'items': items, 'total': tot})

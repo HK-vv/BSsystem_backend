@@ -414,6 +414,25 @@ class Registration(models.Model):
         else:
             raise ContestFinishedError("It's already finished")
 
+    def get_answer_status(self, pno):
+        try:
+            rec = Record.objects.get(registerid=self, problemno=pno)
+        except Record.DoesNotExist:
+            rec = None
+        if rec:
+            if rec.submitted == "":
+                return {'status': 'timeout'}
+            return {'status': 'valid',
+                    'correct': rec.result == 'T'}
+        return {'status': 'miss'}
+
+    def get_answer_statuses(self):
+        tot = self.contestid.count_problem()
+        lst = []
+        for i in range(1, tot + 1):
+            lst.append(self.get_answer_status(i))
+        return lst
+
 
 class Record(models.Model):
     registerid = models.ForeignKey(Registration, on_delete=models.CASCADE, null=True)
