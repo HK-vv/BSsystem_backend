@@ -423,7 +423,8 @@ class Registration(models.Model):
             if rec.submitted == "":
                 return {'status': 'timeout'}
             return {'status': 'valid',
-                    'correct': rec.result == 'T'}
+                    'correct': rec.result == 'T',
+                    'submitted': rec.submitted}
         return {'status': 'miss'}
 
     def get_answer_statuses(self):
