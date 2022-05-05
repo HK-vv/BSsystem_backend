@@ -229,7 +229,7 @@ def leaderboard(request, data):
         contest = Contest.objects.get(id=contestid)
 
         board = contest.get_leaderboard(keyword)
-        total = board.count()
+        total = len(board)
 
         score = contest.get_score()
 
