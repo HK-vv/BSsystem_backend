@@ -239,7 +239,7 @@ def leaderboard(request, data):
 
         for d in items:
             reg = Registration.objects.get(userid__username=d['username'], contestid=contest)
-            d['answer_case'] = reg.get_answer_statuses()
+            d['answer_case'] = list(reg.get_answer_statuses())
 
         return ret_response(0, {'items': items,
                                 'total': total,
