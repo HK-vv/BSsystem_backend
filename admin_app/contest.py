@@ -5,7 +5,7 @@ import pytz
 from django.core.paginator import Paginator
 from django.db import transaction, IntegrityError
 
-from brainstorm.settings import OUTPUT_LOG
+from brainstorm.settings import OUTPUT_LOG, INF
 from bsmodels.models import Contest, Problem, ContestProblem, Registration
 from utils.auxiliary import ret_response
 from utils.decorators import *
@@ -220,7 +220,8 @@ def del_contest(request, data):
 @require_admin_login
 def leaderboard(request, data):
     contestid = data['contestid']
-    pagesize = data['pagesize']
+    pagesize = int(data['pagesize'])
+    pagesize = INF if pagesize == 0 else pagesize
     pagenum = data['pagenum']
     keyword = data.get('keyword')
 
