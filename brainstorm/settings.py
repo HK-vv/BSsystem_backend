@@ -133,4 +133,4 @@ OUTPUT_LOG = True
 
 UPDATE_INTERVAL = 10
 
-INF = 2 ** 32
+INF = 10 ** 6

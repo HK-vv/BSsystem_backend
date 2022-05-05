@@ -1,6 +1,7 @@
 import datetime
 from datetime import timedelta
 import traceback
+from math import exp
 
 import pytz
 from django.contrib.auth.models import AbstractUser
@@ -403,6 +404,7 @@ class Registration(models.Model):
             return "timeout"
 
         Record.create(reg=self, pno=nc, ans=ans).save()
+        self.update_score()
 
     def get_current_problem(self):
         totn = self.contestid.count_problem()
@@ -419,13 +421,19 @@ class Registration(models.Model):
             rec = Record.objects.get(registerid=self, problemno=pno)
         except Record.DoesNotExist:
             rec = None
+        pid = ContestProblem.objects.get(contestid=self.contestid, number=pno)
+        d = {}
         if rec:
             if rec.submitted == "":
-                return {'status': 'timeout'}
-            return {'status': 'valid',
-                    'correct': rec.result == 'T',
-                    'submitted': rec.submitted}
-        return {'status': 'miss'}
+                d.update({'status': 'timeout'})
+            else:
+                d.update({'status': 'valid',
+                          'correct': rec.result == 'T',
+                          'submitted': rec.submitted})
+        else:
+            d.update({'status': 'miss'})
+        d.update({'pid': pid})
+        return d
 
     def get_answer_statuses(self):
         tot = self.contestid.count_problem()
@@ -433,6 +441,26 @@ class Registration(models.Model):
         for i in range(1, tot + 1):
             lst.append(self.get_answer_status(i))
         return lst
+
+    def update_score(self):
+        k = 2.7
+
+        def f(x):
+            return 100 * (1 - exp(-k * x))
+
+        tot = self.contestid.count_problem()
+        s = self.get_answer_statuses()
+        p = tp = 0
+        i = 0
+        for d in s:
+            i += 1
+            if d['status'] == 'valid' and d['correct']:
+                p += 1
+                tp += ContestProblem.objects.get(number=i, contestid=self.contestid).duration
+        rp = p / tot
+        t = (self.currenttime - self.starttime).total_seconds()
+        s = rp ** 2 * tp / t
+        return f(s)
 
 
 class Record(models.Model):
