@@ -83,5 +83,6 @@ def user_contest_result(request, data):
                 'problemid': problem.id,
                 'answer': problem.answer}
         item.update(reg.get_answer_status(i))
+        items.append(item)
 
     return ret_response(0, {'items': items, 'total': tot})
