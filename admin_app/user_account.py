@@ -44,6 +44,7 @@ def user_contest_history(request, data):
     if kw is not None and kw != "":
         lst = lst.filter(contestid__name__icontains=kw)
     tot = lst.count()
+    lst = lst.order_by('-regtime')
     page = Paginator(lst, ps).page(pn)
     items = page.object_list.values('contestid',
                                     'contestid__name',
