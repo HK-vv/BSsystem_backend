@@ -212,12 +212,19 @@ class Contest(models.Model):
 
         regs = list(regs)
         for item in regs:
-            item['changed_rating'] = item['afterrating'] - item['beforerating']
-            item['before_rating'] = item['beforerating']
+            user =  BSUser.objects.get(openid=item['userid_id'])
+
+            if item['afterrating'] is not None and item['beforerating'] is not None:
+                item['changed_rating'] = item['afterrating'] - item['beforerating']
+                item['before_rating'] = item['beforerating']
+            else:
+                item['changed_rating'] = 0
+                item['before_rating'] = user.rating
+
             del item['beforerating']
             del item['afterrating']
 
-            item['username'] = BSUser.objects.get(openid=item['userid_id']).username
+            item['username'] = user.username
             del item['userid_id']
         return regs
 
