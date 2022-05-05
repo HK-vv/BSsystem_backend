@@ -339,7 +339,7 @@ class Registration(models.Model):
     currenttime = models.DateTimeField(null=True)
     correct = models.IntegerField(null=True)
     timecost = models.IntegerField(null=True)
-    score = models.IntegerField(null=True)
+    score = models.FloatField(null=True)
     rank = models.IntegerField(null=True, default=1)
     beforerating = models.IntegerField(null=True)
     afterrating = models.IntegerField(null=True)
@@ -413,7 +413,6 @@ class Registration(models.Model):
             return "timeout"
 
         Record.create(reg=self, pno=nc, ans=ans).save()
-        self.update_score()
 
     def get_current_problem(self):
         totn = self.contestid.count_problem()
@@ -472,6 +471,8 @@ class Registration(models.Model):
         if t != 0:
             s = rp ** 2 * tp / t
         self.score = f(s)
+        if OUTPUT_LOG:
+            print(f"score updated to {self.score}")
 
 
 class Record(models.Model):

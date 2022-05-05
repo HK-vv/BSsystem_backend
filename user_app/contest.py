@@ -184,6 +184,7 @@ def submit_answer(request, data):
         with transaction.atomic():
             r = reg.submit_current(ans, pn)
             reg.next_problem()
+            reg.update_score()
     except SubmitWrongProblemError as e:
         return msg_response(1, e.args[0])
 
