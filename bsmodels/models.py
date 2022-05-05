@@ -408,6 +408,8 @@ class Registration(models.Model):
         if t - tc > timedelta(seconds=ps[nc]['dt']):
             if OUTPUT_LOG:
                 print(f"timeout on {nc}th problem ")
+                Record.create(reg=self, pno=nc, ans='').save()
+                self.update_score()
             return "timeout"
 
         Record.create(reg=self, pno=nc, ans=ans).save()
