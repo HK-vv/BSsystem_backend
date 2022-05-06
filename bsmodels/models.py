@@ -463,6 +463,9 @@ class Registration(models.Model):
             lst.append(self.get_answer_status(i))
         return lst
 
+    def correct_count(self):
+        return Record.objects.filter(registerid=self, result='T').count()
+
     def update_score(self):
         k = 2.7
 
