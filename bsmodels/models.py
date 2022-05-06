@@ -259,10 +259,10 @@ class Contest(models.Model):
                 item['changed_rating'] = 0
                 item['before_rating'] = user.rating
 
-                if reg.starttime and reg.currenttime:
-                    item['timecost'] = int((reg.currenttime - reg.starttime).total_seconds())
-                else:
-                    item['timecost'] = 0
+            if reg.starttime and reg.currenttime:
+                item['timecost'] = int((reg.currenttime - reg.starttime).total_seconds())
+            else:
+                item['timecost'] = 0
 
             return item
 
