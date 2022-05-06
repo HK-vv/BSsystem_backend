@@ -18,8 +18,8 @@ class Test(TestCase):
         # client = Client()
 
         payload = {
-            'username': 'super',
-            'password': '123456'
+            'username': 'eddie',
+            'password': 'Zhang_010705'
         }
 
         # resp = client.post(url, data=payload,
@@ -185,7 +185,7 @@ class Test(TestCase):
     def test_leaderboard(self):
         self.login()
         response = requests.get(f'http://{self.localhost}:{self.port}/api/admin/contest/leaderboard?'
-                                f'contestid=2&pagesize=5&pagenum=1',
+                                f'contestid=59&pagesize=5&pagenum=1',
                                 cookies=self.cookie)
         pprint.pprint(response.json())
 
