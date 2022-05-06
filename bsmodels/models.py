@@ -207,7 +207,7 @@ class Contest(models.Model):
     def get_leaderboard(self, keyword=None):
         self.update_leaderboard()
         regs = Registration.objects.filter(contestid=self).order_by('rank') \
-            .values('userid_id', 'score', 'timecost', 'correct', 'beforerating', 'afterrating', 'rank')
+            .values('userid_id', 'score', 'currenttime', 'starttime', 'correct', 'beforerating', 'afterrating', 'rank')
         if keyword:
             regs = regs.filter(userid__username__contains=keyword)
 
@@ -225,6 +225,14 @@ class Contest(models.Model):
             del item['beforerating']
             del item['afterrating']
 
+            if item['currenttime'] is not None and item['starttime'] is not None:
+                item['timecost'] = int((item['currenttime'] - item['starttime']).total_seconds())
+            else:
+                item['timecost'] = 0
+
+            del item['currenttime']
+            del item['starttime']
+            
             item['username'] = user.username
             del item['userid_id']
         return regs
@@ -233,11 +241,28 @@ class Contest(models.Model):
         try:
             self.update_leaderboard()
             regs = Registration.objects.select_related('userid').filter(contestid=self, userid__username=username) \
-                .values('score', 'timecost', 'correct', 'beforerating', 'afterrating', 'rank')[0]
-            regs['changed_rating'] = regs['afterrating'] - regs['beforerating']
-            regs['before_rating'] = regs['beforerating']
+                .values('score', 'currenttime', 'starttime', 'correct', 'beforerating', 'afterrating', 'rank')[0]
+
+            user = BSUser.objects.get(username=username)
+
+            if regs['afterrating'] is not None and regs['beforerating'] is not None:
+                regs['changed_rating'] = regs['afterrating'] - regs['beforerating']
+                regs['before_rating'] = regs['beforerating']
+            else:
+                regs['changed_rating'] = 0
+                regs['before_rating'] = user.rating
+
             del regs['beforerating']
             del regs['afterrating']
+            
+            if regs['currenttime'] is not None and regs['starttime'] is not None:
+                regs['timecost'] = int((regs['currenttime'] - regs['starttime']).total_seconds())
+            else:
+                regs['timecost'] = 0
+                
+            del regs['currenttime']
+            del regs['starttime']
+            
             regs['username'] = username
             return regs
         except Exception as e:
