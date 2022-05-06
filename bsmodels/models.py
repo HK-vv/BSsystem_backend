@@ -1,7 +1,7 @@
 import datetime
 from datetime import timedelta
 import traceback
-from math import exp
+from math import exp, sqrt
 
 import pytz
 from django.contrib.auth.models import AbstractUser
@@ -498,10 +498,10 @@ class Registration(models.Model):
         return Record.objects.filter(registerid=self, result='T').count()
 
     def update_score(self):
-        k = 2.7
+        k = 1.56
 
         def f(x):
-            return 100 * (1 - exp(-k * x))
+            return 100 * (1 - exp(-k * sqrt(x)))
 
         tot = self.contestid.count_problem()
         s = self.get_answer_statuses()
