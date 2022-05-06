@@ -231,6 +231,16 @@ def result(request, data):
                 item['answer'] = None
 
             items.append(item)
+        info = contest.get_user_rank(user.username)
+
+        return ret_response(0, {'items': items,
+                                'total': len(problems),
+                                'score': info['score'],
+                                'timecost': info['timecost'],
+                                'rank': info['rank'],
+                                'before_rating': info['before_rating'],
+                                'changed_rating': info['changed_rating']
+                                })
 
     except Contest.DoesNotExist as cdne:
         traceback.print_exc()
@@ -244,15 +254,6 @@ def result(request, data):
         traceback.print_exc()
         print(rdne.args)
         return msg_response(1, msg=f'您未参加比赛')
-
-    return ret_response(0, {'items': items,
-                            'total': len(problems),
-                            'score': reg.score,
-                            'timecost': reg.timecost,
-                            'rank': reg.rank,
-                            'before_rating': reg.beforerating,
-                            'changed_rating': reg.afterrating - reg.beforerating
-                            })
 
 
 @require_user_login
