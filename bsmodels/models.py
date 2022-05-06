@@ -206,65 +206,63 @@ class Contest(models.Model):
 
     def get_leaderboard(self, keyword=None):
         self.update_leaderboard()
-        regs = Registration.objects.filter(contestid=self).order_by('rank') \
-            .values('userid_id', 'score', 'currenttime', 'starttime', 'correct', 'beforerating', 'afterrating', 'rank')
+        regs = Registration.objects.filter(contestid=self).order_by('rank')
         if keyword:
             regs = regs.filter(userid__username__contains=keyword)
 
-        regs = list(regs)
-        for item in regs:
-            user = BSUser.objects.get(openid=item['userid_id'])
+        items = []
+        for reg in regs:
+            user = reg.userid
 
-            if item['afterrating'] is not None and item['beforerating'] is not None:
-                item['changed_rating'] = item['afterrating'] - item['beforerating']
-                item['before_rating'] = item['beforerating']
+            item = {
+                'rank': reg.rank,
+                'username': user.username,
+                'score': reg.score,
+                'correct': reg.correct_count(),
+            }
+
+            if reg.afterrating and reg.beforerating:
+                item['changed_rating'] = reg.afterrating - reg.beforerating
+                item['before_rating'] = reg.beforerating
             else:
                 item['changed_rating'] = 0
                 item['before_rating'] = user.rating
 
-            del item['beforerating']
-            del item['afterrating']
-
-            if item['currenttime'] is not None and item['starttime'] is not None:
-                item['timecost'] = int((item['currenttime'] - item['starttime']).total_seconds())
+            if reg.starttime and reg.currenttime:
+                item['timecost'] = int((reg.currenttime - reg.starttime).total_seconds())
             else:
                 item['timecost'] = 0
-
-            del item['currenttime']
-            del item['starttime']
-            
-            item['username'] = user.username
-            del item['userid_id']
-        return regs
+            items.append(item)
+        return items
 
     def get_user_rank(self, username):
         try:
             self.update_leaderboard()
-            regs = Registration.objects.select_related('userid').filter(contestid=self, userid__username=username) \
-                .values('score', 'currenttime', 'starttime', 'correct', 'beforerating', 'afterrating', 'rank')[0]
+            regs = Registration.objects.select_related('userid').filter(contestid=self, userid__username=username)
 
-            user = BSUser.objects.get(username=username)
+            reg = regs[0]
+            user = reg.userid
 
-            if regs['afterrating'] is not None and regs['beforerating'] is not None:
-                regs['changed_rating'] = regs['afterrating'] - regs['beforerating']
-                regs['before_rating'] = regs['beforerating']
+            item = {
+                'rank': reg.rank,
+                'username': user.username,
+                'score': reg.score,
+                'correct': reg.correct_count(),
+            }
+
+            if reg.afterrating and reg.beforerating:
+                item['changed_rating'] = reg.afterrating - reg.beforerating
+                item['before_rating'] = reg.beforerating
             else:
-                regs['changed_rating'] = 0
-                regs['before_rating'] = user.rating
+                item['changed_rating'] = 0
+                item['before_rating'] = user.rating
 
-            del regs['beforerating']
-            del regs['afterrating']
-            
-            if regs['currenttime'] is not None and regs['starttime'] is not None:
-                regs['timecost'] = int((regs['currenttime'] - regs['starttime']).total_seconds())
+            if reg.starttime and reg.currenttime:
+                item['timecost'] = int((reg.currenttime - reg.starttime).total_seconds())
             else:
-                regs['timecost'] = 0
-                
-            del regs['currenttime']
-            del regs['starttime']
-            
-            regs['username'] = username
-            return regs
+                item['timecost'] = 0
+
+            return item
         except Exception as e:
             traceback.print_exc()
             print(e.args)
