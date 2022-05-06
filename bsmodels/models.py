@@ -232,7 +232,7 @@ class Contest(models.Model):
 
             del item['currenttime']
             del item['starttime']
-            
+
             item['username'] = user.username
             del item['userid_id']
         return regs
@@ -254,15 +254,15 @@ class Contest(models.Model):
 
             del regs['beforerating']
             del regs['afterrating']
-            
+
             if regs['currenttime'] is not None and regs['starttime'] is not None:
                 regs['timecost'] = int((regs['currenttime'] - regs['starttime']).total_seconds())
             else:
                 regs['timecost'] = 0
-                
+
             del regs['currenttime']
             del regs['starttime']
-            
+
             regs['username'] = username
             return regs
         except Exception as e:
@@ -499,15 +499,18 @@ class Registration(models.Model):
 
         tot = self.contestid.count_problem()
         s = self.get_answer_statuses()
-        p = tp = 0
+        p = tp = ts = 0
         i = 0
         for d in s:
             i += 1
+            cp = ContestProblem.objects.get(number=i, contestid=self.contestid)
+            ts += cp.duration
             if d['status'] == 'valid' and d['correct']:
                 p += 1
-                tp += ContestProblem.objects.get(number=i, contestid=self.contestid).duration
+                tp += cp.duration
         rp = p / tot
         t = (self.currenttime - self.starttime).total_seconds()
+        t = max(t, ts / 10)
         s = 0
         if t != 0:
             s = rp ** 2 * tp / t
