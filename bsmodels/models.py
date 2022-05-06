@@ -260,15 +260,28 @@ class Contest(models.Model):
         if rated and not self.rated:
             raise Exception("could not rate the unrated contest")
         with transaction.atomic():
-            self.announced = True
             if rated:
                 self.__update_rating()
                 pass
+            self.announced = True
             self.save()
 
     def __update_rating(self):
         # TODO: maybe most logical work in auxiliary?
-        pass
+        self.update_leaderboard()
+        regs = Registration.objects.filter(contestid=self)
+        regs = list(regs)
+        blst = rlst = {}
+        for reg in regs:
+            blst[reg.userid_id] = reg.userid.rating
+            rlst[reg.userid_id] = reg.rank
+
+        alst = blst  # call rating calculate function instead
+
+        for reg in regs:
+            reg.beforerating = blst[reg.userid_id]
+            reg.afterrating = alst[reg.userid_id]
+            reg.save()
 
     def statistics(self):
         prob = self.get_problems()
