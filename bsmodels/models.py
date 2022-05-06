@@ -185,6 +185,7 @@ class Contest(models.Model):
         regs = Registration.objects.filter(contestid=self).order_by('-score', 'timecost')
         try:
             with transaction.atomic():
+                self.update_scores()
                 for i in range(0, len(regs)):
                     if i == 0:
                         regs[i].rank = 1
@@ -306,6 +307,12 @@ class Contest(models.Model):
             reg.beforerating = blst[reg.userid_id]
             reg.afterrating = alst[reg.userid_id]
             reg.save()
+
+    def update_scores(self):
+        regs = Registration.objects.filter(contestid=self)
+        with transaction.atomic():
+            for r in regs:
+                r.update_score()
 
     def statistics(self):
         prob = self.get_problems()
