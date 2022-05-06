@@ -515,7 +515,10 @@ class Registration(models.Model):
                 p += 1
                 tp += cp.duration
         rp = p / tot
-        t = (self.currenttime - self.starttime).total_seconds()
+        try:
+            t = (self.currenttime - self.starttime).total_seconds()
+        except TypeError:
+            t = 0
         t = max(t, ts / 10)
         s = 0
         if t != 0:
