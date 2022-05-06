@@ -206,146 +206,149 @@ class Contest(models.Model):
 
     def get_leaderboard(self, keyword=None):
         self.update_leaderboard()
-        regs = Registration.objects.filter(contestid=self).order_by('rank') \
-            .values('userid_id', 'score', 'currenttime', 'starttime', 'correct', 'beforerating', 'afterrating', 'rank')
+        regs = Registration.objects.filter(contestid=self).order_by('rank')
         if keyword:
             regs = regs.filter(userid__username__contains=keyword)
 
-        regs = list(regs)
-        for item in regs:
-            user = BSUser.objects.get(openid=item['userid_id'])
+        items = []
+        for reg in regs:
+            user = reg.userid
 
-            if item['afterrating'] is not None and item['beforerating'] is not None:
-                item['changed_rating'] = item['afterrating'] - item['beforerating']
-                item['before_rating'] = item['beforerating']
+            item = {
+                'rank': reg.rank,
+                'username': user.username,
+                'score': reg.score,
+                'correct': reg.correct_count(),
+            }
+
+            if reg.afterrating and reg.beforerating:
+                item['changed_rating'] = reg.afterrating - reg.beforerating
+                item['before_rating'] = reg.beforerating
             else:
                 item['changed_rating'] = 0
                 item['before_rating'] = user.rating
 
-            del item['beforerating']
-            del item['afterrating']
-
-            if item['currenttime'] is not None and item['starttime'] is not None:
-                item['timecost'] = int((item['currenttime'] - item['starttime']).total_seconds())
+            if reg.starttime and reg.currenttime:
+                item['timecost'] = int((reg.currenttime - reg.starttime).total_seconds())
             else:
                 item['timecost'] = 0
 
-            del item['currenttime']
-            del item['starttime']
-
-            item['username'] = user.username
-            del item['userid_id']
-        return regs
+            items.append(item)
+        return items
 
     def get_user_rank(self, username):
         try:
             self.update_leaderboard()
-            regs = Registration.objects.select_related('userid').filter(contestid=self, userid__username=username) \
-                .values('score', 'currenttime', 'starttime', 'correct', 'beforerating', 'afterrating', 'rank')[0]
+            regs = Registration.objects.select_related('userid').filter(contestid=self, userid__username=username)
 
-            user = BSUser.objects.get(username=username)
+            reg = regs[0]
+            user = reg.userid
 
-            if regs['afterrating'] is not None and regs['beforerating'] is not None:
-                regs['changed_rating'] = regs['afterrating'] - regs['beforerating']
-                regs['before_rating'] = regs['beforerating']
+            item = {
+                'rank': reg.rank,
+                'username': user.username,
+                'score': reg.score,
+                'correct': reg.correct_count(),
+            }
+
+            if reg.afterrating and reg.beforerating:
+                item['changed_rating'] = reg.afterrating - reg.beforerating
+                item['before_rating'] = reg.beforerating
             else:
-                regs['changed_rating'] = 0
-                regs['before_rating'] = user.rating
+                item['changed_rating'] = 0
+                item['before_rating'] = user.rating
 
-            del regs['beforerating']
-            del regs['afterrating']
+                if reg.starttime and reg.currenttime:
+                    item['timecost'] = int((reg.currenttime - reg.starttime).total_seconds())
+                else:
+                    item['timecost'] = 0
 
-            if regs['currenttime'] is not None and regs['starttime'] is not None:
-                regs['timecost'] = int((regs['currenttime'] - regs['starttime']).total_seconds())
-            else:
-                regs['timecost'] = 0
+            return item
 
-            del regs['currenttime']
-            del regs['starttime']
-
-            regs['username'] = username
-            return regs
         except Exception as e:
             traceback.print_exc()
             print(e.args)
-            return None
 
-    def get_score(self):
-        regs = Registration.objects.filter(contestid=self)
-        score = {
-            'highest': regs.aggregate(Max('score'))['score__max'],
-            'average': regs.aggregate(Avg('score'))['score__avg'],
-            'lowest': regs.aggregate(Min('score'))['score__min'],
+
+def get_score(self):
+    regs = Registration.objects.filter(contestid=self)
+    score = {
+        'highest': regs.aggregate(Max('score'))['score__max'],
+        'average': regs.aggregate(Avg('score'))['score__avg'],
+        'lowest': regs.aggregate(Min('score'))['score__min'],
+    }
+    return score
+
+
+def annouce(self, rated):
+    if self.announced:
+        return
+    if rated and not self.rated:
+        raise Exception("could not rate the unrated contest")
+    with transaction.atomic():
+        if rated:
+            self.__update_rating()
+            pass
+        self.announced = True
+        self.save()
+
+
+def __update_rating(self):
+    # TODO: maybe most logical work in auxiliary?
+    self.update_leaderboard()
+    regs = Registration.objects.filter(contestid=self)
+    regs = list(regs)
+    blst = rlst = {}
+    for reg in regs:
+        blst[reg.userid_id] = reg.userid.rating
+        rlst[reg.userid_id] = reg.rank
+
+    alst = blst  # call rating calculate function instead
+
+    for reg in regs:
+        reg.beforerating = blst[reg.userid_id]
+        reg.afterrating = alst[reg.userid_id]
+        reg.save()
+
+
+def statistics(self):
+    prob = self.get_problems()
+    regs = Registration.objects.filter(contestid=self)
+    records = Record.objects.filter(registerid__in=regs)
+
+    problems = []
+    for pno in prob.keys():
+        rec = records.filter(problemno=pno)
+
+        item = {
+            'problemno': pno,
+            'correct': rec.filter(result='T').count(),
+            'all': rec.count(),
         }
-        return score
+        problems.append(item)
 
-    def annouce(self, rated):
-        if self.announced:
-            return
-        if rated and not self.rated:
-            raise Exception("could not rate the unrated contest")
-        with transaction.atomic():
-            if rated:
-                self.__update_rating()
-                pass
-            self.announced = True
-            self.save()
+    total = len(problems)
 
-    def __update_rating(self):
-        # TODO: maybe most logical work in auxiliary?
-        self.update_leaderboard()
-        regs = Registration.objects.filter(contestid=self)
-        regs = list(regs)
-        blst = rlst = {}
-        for reg in regs:
-            blst[reg.userid_id] = reg.userid.rating
-            rlst[reg.userid_id] = reg.rank
+    max_score = 100
+    min_score = 0
+    sections = []
 
-        alst = blst  # call rating calculate function instead
+    for section in range(10):
+        l = min_score + section * max_score / 10.0
+        r = min_score + (section + 1) * max_score / 10.0
+        if section == 0:
+            sections.append(regs.filter(score__gte=l, score__lte=r).count())
+        else:
+            sections.append(regs.filter(score__gt=l, score__lte=r).count())
 
-        for reg in regs:
-            reg.beforerating = blst[reg.userid_id]
-            reg.afterrating = alst[reg.userid_id]
-            reg.save()
-
-    def statistics(self):
-        prob = self.get_problems()
-        regs = Registration.objects.filter(contestid=self)
-        records = Record.objects.filter(registerid__in=regs)
-
-        problems = []
-        for pno in prob.keys():
-            rec = records.filter(problemno=pno)
-
-            item = {
-                'problemno': pno,
-                'correct': rec.filter(result='T').count(),
-                'all': rec.count(),
-            }
-            problems.append(item)
-
-        total = len(problems)
-
-        max_score = 100
-        min_score = 0
-        sections = []
-
-        for section in range(10):
-            l = min_score + section * max_score / 10.0
-            r = min_score + (section + 1) * max_score / 10.0
-            if section == 0:
-                sections.append(regs.filter(score__gte=l, score__lte=r).count())
-            else:
-                sections.append(regs.filter(score__gt=l, score__lte=r).count())
-
-        return {
-            'problems': problems,
-            'total': total,
-            'sections': sections,
-            'average_score': self.get_score()['average'],
-            'registrants': regs.count(),
-            'participants': records.values('registerid').distinct().count(),
-        }
+    return {
+        'problems': problems,
+        'total': total,
+        'sections': sections,
+        'average_score': self.get_score()['average'],
+        'registrants': regs.count(),
+        'participants': records.values('registerid').distinct().count(),
+    }
 
 
 class ContestProblem(models.Model):

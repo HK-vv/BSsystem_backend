@@ -212,7 +212,7 @@ def result(request, data):
         for no in problems.keys():
             problemid = problems[no]['id']
             item = {
-                'problemno': no,
+                'problemnum': no,
                 'problemid': problemid,
                 # 'answer': 'A'
             }
