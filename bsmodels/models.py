@@ -234,10 +234,7 @@ class Contest(models.Model):
                 item['changed_rating'] = None
                 item['before_rating'] = user.rating
 
-            if reg.starttime and reg.currenttime:
-                item['timecost'] = reg.timecost
-            else:
-                item['timecost'] = 0
+            item['timecost'] = reg.timecost if reg.timecost else 0
 
             items.append(item)
         return items
@@ -264,10 +261,7 @@ class Contest(models.Model):
                 item['changed_rating'] = None
                 item['before_rating'] = user.rating
 
-            if reg.starttime and reg.currenttime:
-                item['timecost'] = reg.timecost
-            else:
-                item['timecost'] = 0
+                item['timecost'] = reg.timecost if reg.timecost else 0
 
             return item
 
