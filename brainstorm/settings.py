@@ -24,6 +24,7 @@ with open('./secret.json') as f:
     SECRET_KEY = secret['api_key']
     APPID = secret['APPID']
     SECRET = secret['SECRET']
+    db_config = secret['db_config']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -82,10 +83,7 @@ WSGI_APPLICATION = 'brainstorm.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': db_config
 }
 
 # Password validation
