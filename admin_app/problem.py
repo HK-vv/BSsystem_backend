@@ -36,6 +36,11 @@ def data2problem(data, user):
                       public=public,
                       authorid=user)
 
+    if len(answer) > 80:
+        raise Exception("答案过长")
+    if len(description) > 150:
+        raise Exception("题目描述过长")
+
     # 单选 多选
     if type in ['single', 'multiple']:
         if A and B and C and D:
