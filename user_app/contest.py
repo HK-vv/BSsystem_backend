@@ -258,7 +258,7 @@ def result(request, data):
 
 @require_user_login
 def leaderboard(request, data):
-    contestid = data['contestid']
+    contestid = int(data['contestid'])
     user = request.user
     try:
         contest = Contest.objects.get(id=contestid)
