@@ -1,12 +1,8 @@
 import datetime
 import json
-import re
 
 import pytz
 from django.http import JsonResponse
-import requests
-
-from brainstorm.settings import OUTPUT_LOG
 
 
 def get_data(request):

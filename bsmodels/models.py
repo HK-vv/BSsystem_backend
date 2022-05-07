@@ -17,6 +17,11 @@ class BSUser(models.Model):
     openid = models.CharField(max_length=40, primary_key=True)
     username = models.CharField(max_length=20, unique=True)
     rating = models.IntegerField(default=0)
+    rank = models.IntegerField(default=0)
+
+    def set_initial_rank(self):
+        self.rank = BSUser.objects.filter(rating__gt=0).count() + 1
+        self.save()
 
 
 class BSAdmin(AbstractUser):
@@ -287,6 +292,7 @@ class Contest(models.Model):
         with transaction.atomic():
             if rated:
                 self.__update_rating()
+                update_rank()
                 pass
             self.announced = True
             self.save()
@@ -552,3 +558,25 @@ class Record(models.Model):
     def get_problem(self):
         return Problem.objects.get(contestproblem__contestid=self.registerid.contestid,
                                    contestproblem__number=self.problemno)
+
+
+def update_rank():
+    users = BSUser.objects.order_by('-rating')
+    try:
+        with transaction.atomic():
+            for i in range(0, len(users)):
+                if i == 0:
+                    users[i].rank = 1
+                else:
+                    if users[i].rating == users[i - 1].rating:
+                        users[i].rank = users[i - 1].rank
+                    else:
+                        users[i].rank = i + 1
+                users[i].save()
+
+            if OUTPUT_LOG:
+                print(f'rating排行榜已更新')
+    except Exception as e:
+        if OUTPUT_LOG:
+            print(f'rating排行榜更新失败')
+        raise e

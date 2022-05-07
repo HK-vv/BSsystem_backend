@@ -39,7 +39,7 @@ def login(request, data):
             username = "bs_" + ''.join(random.sample(string.ascii_letters + string.digits, 10))
 
         BSUser.objects.create(openid=openid,
-                              username=username)
+                              username=username).set_initial_rank()
         if OUTPUT_LOG:
             print(f"{username} 用户成功注册")
     else:
