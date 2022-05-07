@@ -301,10 +301,10 @@ class Contest(models.Model):
         regs = Registration.objects.filter(contestid=self)
         regs = list(regs)
         blst = {}
-        # rlst = {}
+        rlst = {}
         for reg in regs:
             blst[reg.userid_id] = reg.userid.rating
-            # rlst[reg.userid_id] = reg.rank
+            rlst[reg.userid_id] = reg.rank
 
         alst = blst  # TODO: call rating calculate function instead
 
