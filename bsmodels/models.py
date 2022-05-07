@@ -15,7 +15,7 @@ from utils.exceptions import SubmitWrongProblemError, ContestFinishedError
 
 class BSUser(models.Model):
     openid = models.CharField(max_length=40, primary_key=True)
-    username = models.CharField(max_length=20, unique=True)
+    username = models.CharField(max_length=40, unique=True)
     rating = models.IntegerField(default=0)
     rank = models.IntegerField(default=0)
 
@@ -27,10 +27,10 @@ class BSUser(models.Model):
 class BSAdmin(AbstractUser):
     DEFAULT_PASSWORD = '123456'
 
-    username = models.CharField(max_length=20, unique=True)
-    password = models.CharField(max_length=20, default=DEFAULT_PASSWORD)
-    email = models.CharField(max_length=30, null=True)
-    phone = models.CharField(max_length=20, null=True)
+    username = models.CharField(max_length=40, unique=True)
+    password = models.CharField(max_length=40, default=DEFAULT_PASSWORD)
+    email = models.CharField(max_length=40, null=True)
+    phone = models.CharField(max_length=40, null=True)
     is_superuser = models.BooleanField(default=False, choices=((False, 'admin'), (True, 'super')))
 
     REQUIRED_FIELDS = []  # ['username']
@@ -138,11 +138,11 @@ class Problem(models.Model):
 
 class Contest(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=30, unique=True)
+    name = models.CharField(max_length=40, unique=True)
     start = models.DateTimeField()
     latest = models.DateTimeField()
     end = models.DateTimeField(null=True)
-    password = models.CharField(max_length=30, null=True)
+    password = models.CharField(max_length=40, null=True)
     rated = models.BooleanField()
     announced = models.BooleanField(default=False)
     ordered = models.BooleanField(default=False)
