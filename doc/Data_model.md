@@ -7,6 +7,7 @@
 | openid   | varchar(30)    | PRIMARY KEY      | 微信提供的唯一标识 |           |
 | username | varchar(20)    | UNIQUE, NOT NULL | 用户名             |           |
 | rating   | int            | NOT NULL         | 分数               | 初始化为0 |
+| rank     | int            | NOT NULL         | 排名               |           |
 
 ### BSAdmin
 
@@ -52,7 +53,7 @@
 | 列名       | 数据类型及精度 | 约束条件                    | 说明                   | 备注               |
 | ---------- | -------------- | --------------------------- | ---------------------- | ------------------ |
 | id         | int            | PRIMARY KEY, AUTO_INCREMENT | 唯一标识               |                    |
-| name       | varchar(30)    | NOT NULL, UNIQUE            | 竞赛名称               |                    |
+| name       | varchar(30)    | NOT NULL                    | 竞赛名称               |                    |
 | start      | datetime       | NOT NULL                    | 竞赛开始时间           |                    |
 | latest     | datetime       | NOT NULL                    | 最晚进入时间           |                    |
 | end        | datetime       | NOT NULL                    | 结束时间               |                    |

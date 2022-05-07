@@ -138,7 +138,7 @@ class Problem(models.Model):
 
 class Contest(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=40, unique=True)
+    name = models.CharField(max_length=40)
     start = models.DateTimeField()
     latest = models.DateTimeField()
     end = models.DateTimeField(null=True)
