@@ -28,7 +28,6 @@ class BSAdmin(AbstractUser):
     DEFAULT_PASSWORD = '123456'
 
     username = models.CharField(max_length=40, unique=True)
-    password = models.CharField(max_length=40, default=DEFAULT_PASSWORD)
     email = models.CharField(max_length=40, null=True)
     phone = models.CharField(max_length=40, null=True)
     is_superuser = models.BooleanField(default=False, choices=((False, 'admin'), (True, 'super')))
