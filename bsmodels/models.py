@@ -293,26 +293,27 @@ class Contest(models.Model):
             if rated:
                 self.__update_rating()
                 update_rank()
-                pass
             self.announced = True
             self.save()
 
     def __update_rating(self):
-        # TODO: maybe most logical work in auxiliary?
         self.update_leaderboard()
         regs = Registration.objects.filter(contestid=self)
         regs = list(regs)
-        blst = rlst = {}
+        blst = {}
+        # rlst = {}
         for reg in regs:
             blst[reg.userid_id] = reg.userid.rating
-            rlst[reg.userid_id] = reg.rank
+            # rlst[reg.userid_id] = reg.rank
 
-        alst = blst  # call rating calculate function instead
+        alst = blst  # TODO: call rating calculate function instead
 
         for reg in regs:
             reg.beforerating = blst[reg.userid_id]
             reg.afterrating = alst[reg.userid_id]
             reg.save()
+            reg.userid.rating = reg.afterrating
+            reg.userid.save()
 
     def update_scores(self):
         regs = Registration.objects.filter(contestid=self)
