@@ -445,6 +445,8 @@ class Registration(models.Model):
         else:
             self.currentnumber = totn + 1
             self.currenttime = t
+
+        self.timecost = (self.currenttime - self.starttime).total_seconds()
         self.save()
 
     def submit_current(self, ans, check_pn=None):
@@ -454,16 +456,22 @@ class Registration(models.Model):
         ps = contest.get_problems()
         t = get_current_time()
 
+        r = None
         if check_pn and check_pn != nc:
             raise SubmitWrongProblemError(f"submit {check_pn} to {nc}")
         if t - tc > timedelta(seconds=ps[nc]['dt']):
+            Record.create(reg=self, pno=nc, ans='').save()
+            r = "timeout"
             if OUTPUT_LOG:
                 print(f"timeout on {nc}th problem ")
-                Record.create(reg=self, pno=nc, ans='').save()
-                self.update_score()
-            return "timeout"
+        else:
+            Record.create(reg=self, pno=nc, ans=ans).save()
+            r = "success"
 
-        Record.create(reg=self, pno=nc, ans=ans).save()
+        self.update_score()
+        self.next_problem()
+
+        return r
 
     def get_current_problem(self):
         totn = self.contestid.count_problem()
