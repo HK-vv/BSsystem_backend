@@ -48,13 +48,31 @@ def data2problem(data, user):
                 too_long.append("选项3")
             if len(D) > 25:
                 too_long.append("选项4")
+
             if len(too_long) > 0:
                 # 将too_long列表的字符连接，并用顿号分隔
                 errs = "、".join(too_long)
                 raise Exception(f"{errs}过长")
+            if type == 'single':
+                if len(answer) != 1:
+                    raise Exception("单选题只能有一个答案")
+            elif type == 'multiple':
+                if len(answer) > 4:
+                    raise Exception("多选题最多只能有四个答案")
+                for char in answer:
+                    temp = {
+                        'A': False,
+                        'B': False,
+                        'C': False,
+                        'D': False
+                    }
+                    if temp[char]:
+                        raise Exception("多选题不能有重复的答案")
+                    temp[char] = True
             for char in answer:
                 if char not in ['A', 'B', 'C', 'D']:
                     raise Exception("答案错误")
+
             problem.A = A
             problem.B = B
             problem.C = C
@@ -63,6 +81,9 @@ def data2problem(data, user):
             raise Exception("选项为空")
     # 判断
     elif type == 'binary':
+        if answer not in ['A', 'B']:
+            raise Exception("答案错误")
+
         problem.A = '正确'
         problem.B = '错误'
         problem.C = problem.D = None
