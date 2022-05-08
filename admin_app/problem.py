@@ -1,5 +1,6 @@
 from django.core.paginator import Paginator
 from django.db import transaction, DatabaseError
+from django.db.models import ProtectedError
 from django.forms import model_to_dict
 
 from brainstorm.settings import OUTPUT_LOG
@@ -9,7 +10,7 @@ import os
 import pandas as pd
 from utils.auxiliary import *
 import openpyxl
-from bsmodels.models import Problem
+from bsmodels.models import Problem, ContestProblem
 from bsmodels.models import Tag
 from bsmodels.models import ProblemTag
 from bsmodels.models import BSAdmin
@@ -377,6 +378,12 @@ def del_problem(request, data):
                 if problem.authorid != user and not user.is_superuser:
                     return msg_response(1, f'题目{id}不是您创建的题目')
                 problem.delete()
+    except ProtectedError as pe:
+        traceback.print_exc()
+        print(pe.args)
+        cid = ContestProblem.objects.filter(problemid_id__in=id).values_list('contestid_id', flat=True).distinct()
+        return msg_response(1, f'题目{id}在比赛{str(cid)}中使用，无法删除')
+
     except Exception as e:
         traceback.print_exc()
         print(e.args)
