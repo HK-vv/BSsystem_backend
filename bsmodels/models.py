@@ -314,11 +314,13 @@ class Contest(models.Model):
         GlobalVars.put('STIMULATION', remain)
 
         for reg in regs:
-            reg.beforerating = blst[reg.userid_id]
-            reg.afterrating = alst[reg.userid_id]
-            reg.save()
-            reg.userid.rating = reg.afterrating
-            reg.userid.save()
+            # only consider users made submit
+            if reg.timecost is not None:
+                reg.beforerating = blst[reg.userid_id]
+                reg.afterrating = alst[reg.userid_id]
+                reg.save()
+                reg.userid.rating = reg.afterrating
+                reg.userid.save()
 
         if OUTPUT_LOG:
             print("rating updated successfully!")
