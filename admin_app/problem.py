@@ -381,7 +381,7 @@ def del_problem(request, data):
     except ProtectedError as pe:
         traceback.print_exc()
         print(pe.args)
-        cid = ContestProblem.objects.filter(problemid_id=id).values_list('contestid_id', flat=True).distinct()
+        cid = list(ContestProblem.objects.filter(problemid_id=id).values_list('contestid_id', flat=True).distinct())
         return msg_response(1, f'题目{id}在比赛{str(cid)}中使用，无法删除')
 
     except Exception as e:

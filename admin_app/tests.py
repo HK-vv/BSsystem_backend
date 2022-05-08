@@ -19,7 +19,7 @@ class Test(TestCase):
 
         payload = {
             'username': 'eddie',
-            'password': 'Zhang_010705'
+            'password': '123456'
         }
 
         # resp = client.post(url, data=payload,
@@ -82,7 +82,7 @@ class Test(TestCase):
     def test_del_problem(self):
         self.login()
         payload = {
-            "problems": list(range(100, 105))
+            "problems": [1]
         }
         response = requests.put(f'http://{self.localhost}:{self.port}/api/admin/problem/batch/delete',
                                 cookies=self.cookie, json=payload)
@@ -194,3 +194,6 @@ class Test(TestCase):
         response = requests.get(f'http://{self.localhost}:{self.port}/api/admin/contest/statistics?contestid=2',
                                 cookies=self.cookie)
         pprint.pprint(response.json())
+
+t = Test()
+t.test_del_problem()
