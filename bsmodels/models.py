@@ -8,10 +8,10 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models, transaction
 from django.db.models import Max, Avg, Min
 
-from brainstorm.settings import OUTPUT_LOG, UPDATE_INTERVAL
+from brainstorm.settings import OUTPUT_LOG, UPDATE_INTERVAL, INITIAL_RATING
 from utils.auxiliary import get_current_time
 from utils.exceptions import SubmitWrongProblemError, ContestFinishedError
-from utils.rating import calc_rating_result
+from utils.rating import RatingSystem
 
 
 class BSUser(models.Model):
@@ -297,11 +297,21 @@ class Contest(models.Model):
         blst = {}
         rlst = {}
         for reg in regs:
-            if reg.starttime is not None:
+            # only consider users made submit
+            if reg.timecost is not None:
                 blst[reg.userid_id] = reg.userid.rating
                 rlst[reg.userid_id] = reg.rank
 
-        alst = calc_rating_result(rank=rlst, blst=blst)
+        n = len(rlst)
+        remain = GlobalVars.get('STIMULATION')
+        # give more stimulation on open contest
+        stim_rate = 4 if self.password is None else 16
+        stim = min(remain, int(n * INITIAL_RATING / stim_rate))
+        remain -= stim
+        rsystem = RatingSystem(ranks=rlst, before_ratings=blst, stimulation=stim)
+        alst, stim = rsystem.get_new_ratings()
+        remain += stim
+        GlobalVars.put('STIMULATION', remain)
 
         for reg in regs:
             reg.beforerating = blst[reg.userid_id]
@@ -582,3 +592,27 @@ def update_rank():
         if OUTPUT_LOG:
             print(f'rating排行榜更新失败')
         raise e
+
+
+class GlobalVars(models.Model):
+    key = models.CharField(max_length=100)
+    value = models.IntegerField(null=True)
+
+    @classmethod
+    def get(cls, key):
+        var = cls.objects.get(key=key)
+        return var.value
+
+    @classmethod
+    def put(cls, key, value):
+        try:
+            var = cls.objects.get(key=key)
+        except cls.DoesNotExist:
+            var = cls.objects.create(key=key)
+        var.value = value
+        var.save()
+
+    @classmethod
+    def update(cls, key, delta):
+        value = cls.get(key)
+        cls.put(key, value + delta)
