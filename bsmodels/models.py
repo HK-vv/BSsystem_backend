@@ -11,6 +11,7 @@ from django.db.models import Max, Avg, Min
 from brainstorm.settings import OUTPUT_LOG, UPDATE_INTERVAL
 from utils.auxiliary import get_current_time
 from utils.exceptions import SubmitWrongProblemError, ContestFinishedError
+from utils.rating import calc_rating_result
 
 
 class BSUser(models.Model):
@@ -296,10 +297,11 @@ class Contest(models.Model):
         blst = {}
         rlst = {}
         for reg in regs:
-            blst[reg.userid_id] = reg.userid.rating
-            rlst[reg.userid_id] = reg.rank
+            if reg.starttime is not None:
+                blst[reg.userid_id] = reg.userid.rating
+                rlst[reg.userid_id] = reg.rank
 
-        alst = blst  # TODO: call rating calculate function instead
+        alst = calc_rating_result(rank=rlst, blst=blst)
 
         for reg in regs:
             reg.beforerating = blst[reg.userid_id]
