@@ -468,7 +468,8 @@ class Registration(models.Model):
         if check_pn and check_pn != nc:
             raise SubmitWrongProblemError(f"submit {check_pn} to {nc}")
         if t - tc > timedelta(seconds=ps[nc]['dt']):
-            Record.create(reg=self, pno=nc, ans='').save()
+            if not self.contestid.announced:
+                Record.create(reg=self, pno=nc, ans='').save()
             r = "timeout"
             if OUTPUT_LOG:
                 print(f"timeout on {nc}th problem ")
