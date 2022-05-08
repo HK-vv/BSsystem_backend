@@ -320,6 +320,9 @@ class Contest(models.Model):
             reg.userid.rating = reg.afterrating
             reg.userid.save()
 
+        if OUTPUT_LOG:
+            print("rating updated successfully!")
+
     def update_scores(self):
         regs = Registration.objects.filter(contestid=self)
         with transaction.atomic():
