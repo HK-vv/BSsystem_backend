@@ -187,7 +187,8 @@ class Contest(models.Model):
         cur = pytz.UTC.localize(datetime.datetime.now())
         if self.announced or cur < self.updatetime + timedelta(seconds=UPDATE_INTERVAL):
             return
-        regs = Registration.objects.filter(contestid=self).order_by('-score', 'timecost')
+        regs = Registration.objects.filter(contestid=self, timecost__isnull=False).order_by('-score', 'timecost')
+        regs_null = Registration.objects.filter(contestid=self, timecost__isnull=True)
         try:
             with transaction.atomic():
                 self.update_scores()
@@ -200,6 +201,11 @@ class Contest(models.Model):
                         else:
                             regs[i].rank = i + 1
                     regs[i].save()
+
+                for i in range(0, len(regs_null)):
+                    regs_null[i].rank = len(regs) + 1
+                    regs_null[i].save()
+
                 self.updatetime = max(cur, self.start)
                 self.save()
                 if OUTPUT_LOG:
