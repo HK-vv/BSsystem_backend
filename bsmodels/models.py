@@ -433,7 +433,7 @@ class Registration(models.Model):
     currentnumber = models.IntegerField(default=0)
     currenttime = models.DateTimeField(null=True)
     correct = models.IntegerField(null=True)
-    timecost = models.IntegerField(null=True)
+    timecost = models.FloatField(null=True)
     score = models.FloatField(null=True)
     rank = models.IntegerField(null=True, default=1)
     beforerating = models.IntegerField(null=True)
