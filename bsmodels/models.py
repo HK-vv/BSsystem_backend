@@ -21,7 +21,7 @@ class BSUser(models.Model):
     rank = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.openid+": "+self.username
+        return self.openid[:10]+": "+self.username
 
     def set_initial_rank(self):
         self.rank = BSUser.objects.filter(rating__gt=0).count() + 1
