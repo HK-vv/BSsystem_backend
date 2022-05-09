@@ -21,7 +21,7 @@ class BSUser(models.Model):
     rank = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.openid[:10]+": "+self.username
+        return self.openid[:10] + ": " + self.username
 
     def set_initial_rank(self):
         self.rank = BSUser.objects.filter(rating__gt=0).count() + 1
@@ -44,7 +44,7 @@ class BSAdmin(AbstractUser):
         ordering = ['id']
 
     def __str__(self):
-        return str(self.id)+": "+self.username
+        return str(self.id) + ": " + self.username
 
 
 class Problem(models.Model):
@@ -61,7 +61,7 @@ class Problem(models.Model):
     authorid = models.ForeignKey(BSAdmin, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
-        return str(self.id)+": "+self.description[:10]
+        return str(self.id) + ": " + self.description[:10]
 
     # 选择题
     def __choice_check(self, answer, ur_answer):
@@ -158,15 +158,17 @@ class Contest(models.Model):
     authorid = models.ForeignKey(BSAdmin, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
-        return str(self.id)+": "+self.name
+        return str(self.id) + ": " + self.name
 
     def get_end_time(self):
+        return self.latest + self.count_duration()
+
+    def count_duration(self):
         problems = ContestProblem.objects.filter(contestid=self.id)
         max_time = 0
         for problem in problems:
             max_time += problem.duration
-
-        return self.latest + timedelta(seconds=max_time)
+        return timedelta(seconds=max_time)
 
     def get_status(self):
         cur = pytz.UTC.localize(datetime.datetime.now())
@@ -414,7 +416,7 @@ class Tag(models.Model):
     name = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
-        return str(self.id)+": "+self.name
+        return str(self.id) + ": " + self.name
 
 
 class ProblemTag(models.Model):
@@ -491,7 +493,7 @@ class Registration(models.Model):
             self.currenttime = t - (timedelta(seconds=ps[tar]['dt']) - tardt)
         else:
             self.currentnumber = totn + 1
-            self.currenttime = t
+            self.currenttime = min(t, self.starttime + self.contestid.count_duration())
 
         self.timecost = (self.currenttime - self.starttime).total_seconds()
         self.save()
