@@ -321,6 +321,13 @@ class Contest(models.Model):
                 reg.userid.rating = reg.afterrating
                 reg.userid.save()
 
+        # here comes the zero-sum assertion
+        user_num = BSUser.objects.all().count()
+        rating_sum = 0
+        for user in BSUser.objects.all():
+            rating_sum += user.rating
+        assert rating_sum + GlobalVars.get('STIMULATION') == (user_num + 1) * INITIAL_RATING
+
         if OUTPUT_LOG:
             print("rating updated successfully!")
 
