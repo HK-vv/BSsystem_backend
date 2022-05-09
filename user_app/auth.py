@@ -1,13 +1,16 @@
 import string
 import requests
 import random
-from brainstorm.settings import APPID, OUTPUT_LOG
+
+from django.db import transaction
+
+from brainstorm.settings import APPID, OUTPUT_LOG, INITIAL_RATING
 from brainstorm.settings import SECRET
 from utils.decorators import *
 from utils.auxiliary import *
-from bsmodels.models import BSUser
+from bsmodels.models import BSUser, GlobalVars
 
-DEBUG = False
+DEBUG_LOCAL = False
 
 
 # 登陆
@@ -15,13 +18,14 @@ DEBUG = False
 def login(request, data):
     code = data['code']
 
-    if DEBUG:
+    if DEBUG_LOCAL:
         openid = code
         session_key = code
 
     else:
-        response = requests.get(f'https://api.weixin.qq.com/sns/jscode2session?appid={APPID}&secret={SECRET}&js_code={code}'
-                                '&grant_type=authorization_code')
+        response = requests.get(
+            f'https://api.weixin.qq.com/sns/jscode2session?appid={APPID}&secret={SECRET}&js_code={code}'
+            '&grant_type=authorization_code')
 
         info = response.json()
 
@@ -34,14 +38,16 @@ def login(request, data):
     user = BSUser.objects.filter(openid=openid)
     # 不存在用户，注册
     if not user:
-        username = "bs_" + ''.join(random.sample(string.ascii_letters + string.digits, 10))
-        while BSUser.objects.filter(username=username):
+        with transaction.atomic():
             username = "bs_" + ''.join(random.sample(string.ascii_letters + string.digits, 10))
+            while BSUser.objects.filter(username=username):
+                username = "bs_" + ''.join(random.sample(string.ascii_letters + string.digits, 10))
 
-        BSUser.objects.create(openid=openid,
-                              username=username).set_initial_rank()
-        if OUTPUT_LOG:
-            print(f"{username} 用户成功注册")
+            BSUser.objects.create(openid=openid,
+                                  username=username).set_initial_rank()
+            GlobalVars.update('STIMULATION', INITIAL_RATING)
+            if OUTPUT_LOG:
+                print(f"{username} 用户成功注册")
     else:
         username = user[0].username
 
