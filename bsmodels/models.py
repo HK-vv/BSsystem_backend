@@ -20,6 +20,9 @@ class BSUser(models.Model):
     rating = models.IntegerField(default=0)
     rank = models.IntegerField(default=0)
 
+    def __str__(self):
+        return self.username
+
     def set_initial_rank(self):
         self.rank = BSUser.objects.filter(rating__gt=0).count() + 1
         self.save()
@@ -39,6 +42,9 @@ class BSAdmin(AbstractUser):
 
     class Meta:
         ordering = ['id']
+
+    def __str__(self):
+        return self.username
 
 
 class Problem(models.Model):
@@ -150,7 +156,8 @@ class Contest(models.Model):
         datetime.datetime.strptime("2022-1-1 00:00:00", '%Y-%m-%d %H:%M:%S')))
     authorid = models.ForeignKey(BSAdmin, on_delete=models.SET_NULL, blank=True, null=True)
 
-    # problems = models.ManyToManyField(Problem, through=ContestProblem)
+    def __str__(self):
+        return self.name
 
     def get_end_time(self):
         problems = ContestProblem.objects.filter(contestid=self.id)
@@ -293,6 +300,11 @@ class Contest(models.Model):
             if rated:
                 self.__update_rating()
                 update_rank()
+            else:
+                for reg in Registration.objects.filter(contestid=self):
+                    reg.beforerating = reg.userid.rating
+                    reg.afterrating = reg.userid.rating
+                    reg.save()
             self.announced = True
             self.save()
 
@@ -392,15 +404,24 @@ class ContestProblem(models.Model):
     class Meta:
         unique_together = ("contestid", "problemid")
 
+    def __str__(self):
+        return self.problemid.__str__() + " -> " + self.contestid.__str__()
+
 
 class Tag(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=20, unique=True)
 
+    def __str__(self):
+        return self.name
+
 
 class ProblemTag(models.Model):
     problemid = models.ForeignKey(Problem, on_delete=models.CASCADE, blank=True, null=True)
     tagid = models.ForeignKey(Tag, on_delete=models.CASCADE, blank=True, null=True)
+
+    def __str__(self):
+        return self.tagid.__str__() + " -> " + self.problemid.__str__()
 
 
 class Registration(models.Model):
@@ -419,6 +440,9 @@ class Registration(models.Model):
 
     class Meta:
         unique_together = ("userid", "contestid")
+
+    def __str__(self):
+        return self.userid.__str__() + " -> " + self.contestid.__str__()
 
     def start(self):
         with transaction.atomic():
@@ -574,6 +598,9 @@ class Record(models.Model):
     class Meta:
         unique_together = ("registerid", "problemno")
 
+    def __str__(self):
+        return "[" + self.registerid.__str__() + "]: " + str(self.problemno)
+
     @classmethod
     def create(cls, reg, pno, ans):
         rec = cls(registerid=reg,
@@ -619,6 +646,9 @@ class GlobalVars(models.Model):
     """
     key = models.CharField(max_length=100)
     value = models.IntegerField(null=True)
+
+    def __str__(self):
+        return self.key
 
     @classmethod
     def get(cls, key):
