@@ -20,7 +20,8 @@ class RatingSystem:
         self.ratings = before_ratings.copy()
         self.participants.append(-1)
         self.rank[-1] = max(ranks.values()) + 1
-        self.ratings[-1] = stimulation if stimulation is not None else 0
+        self.stimulation = stimulation if stimulation is not None else 0
+        self.ratings[-1] = self.stimulation
         self.__rearrange_ranks()
 
     def get_new_ratings(self):
@@ -29,8 +30,12 @@ class RatingSystem:
         for i in self.participants:
             r[i] = self.ratings[i] + self.d[i]
         r.pop(-1)
-        rem = self.d[-1]
-        return r, rem
+        dsum = 0
+        for i in self.participants:
+            if i != -1:
+                dsum += self.d[i]
+        cost = dsum
+        return r, cost
 
     def __calc_diff(self):
         orded_by_rating = sorted(self.ratings.items(), key=lambda it: it[1], reverse=True)
@@ -86,9 +91,11 @@ class RatingSystem:
 if __name__ == '__main__':
     rlst = {}
     blst = {}
-    for i in range(1, 11):
+    n=10
+    for i in range(1, n+1):
         rlst[i] = i
         blst[i] = 0
+    remain = (n+1)*1000
     while True:
         input("press enter")
         print("contest result:")
@@ -96,11 +103,20 @@ if __name__ == '__main__':
         print('blst:', blst)
 
         print("after contest ratings")
-        rs = RatingSystem(ranks=rlst, before_ratings=blst, stimulation=5000)
-        nlst = rs.get_new_ratings()
+        rs = RatingSystem(ranks=rlst, before_ratings=blst, stimulation=remain)
+        nlst, cost = rs.get_new_ratings()
+        remain -= cost
         delta = {}
         for i in blst.keys():
             delta[i] = nlst[i] - blst[i]
         print('new ratings:', nlst)
         print('delta:', delta)
         blst = nlst
+
+        print('remain:',remain)
+
+        # print("here comes the assertions")
+        # sm = 0
+        # for i in delta.keys():
+        #     sm += delta[i]
+        # print(5000 - sm, cost)

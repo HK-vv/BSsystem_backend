@@ -305,12 +305,11 @@ class Contest(models.Model):
         n = len(rlst)
         remain = GlobalVars.get('STIMULATION')
         # give more stimulation on open contest
-        stim_rate = 4 if self.password is None else 16
-        stim = min(remain, int(n * INITIAL_RATING / stim_rate))
-        remain -= stim
+        stim_rate = 1 if self.password is None else 2
+        stim = min(remain, int(n * INITIAL_RATING // stim_rate))
         rsystem = RatingSystem(ranks=rlst, before_ratings=blst, stimulation=stim)
-        alst, stim = rsystem.get_new_ratings()
-        remain += stim
+        alst, cost = rsystem.get_new_ratings()
+        remain -= cost
         GlobalVars.put('STIMULATION', remain)
 
         for reg in regs:
@@ -601,6 +600,10 @@ def update_rank():
 
 
 class GlobalVars(models.Model):
+    """
+    Global Variable Contents
+    'STIMULATION': remain amount of rating pool
+    """
     key = models.CharField(max_length=100)
     value = models.IntegerField(null=True)
 
