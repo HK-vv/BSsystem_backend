@@ -13,7 +13,8 @@ def get_profile(request, data):
         user = BSUser.objects.get(openid=openid)
         info = {
             'username': user.username,
-            'rating': user.rating
+            'rating': user.rating,
+            'rank': user.rank,
         }
         return JsonResponse({'ret': 0,
                              'info': info})

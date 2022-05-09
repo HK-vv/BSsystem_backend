@@ -227,11 +227,11 @@ class Contest(models.Model):
                 'correct': reg.correct_count(),
             }
 
-            if reg.afterrating and reg.beforerating:
+            if reg.afterrating is not None and reg.beforerating is not None:
                 item['changed_rating'] = reg.afterrating - reg.beforerating
                 item['before_rating'] = reg.beforerating
             else:
-                item['changed_rating'] = None
+                item['changed_rating'] = 0
                 item['before_rating'] = user.rating
 
             item['timecost'] = reg.timecost if reg.timecost else 0
@@ -254,14 +254,14 @@ class Contest(models.Model):
                 'correct': reg.correct_count(),
             }
 
-            if reg.afterrating and reg.beforerating:
+            if reg.afterrating is not None and reg.beforerating is not None:
                 item['changed_rating'] = reg.afterrating - reg.beforerating
                 item['before_rating'] = reg.beforerating
             else:
-                item['changed_rating'] = None
+                item['changed_rating'] = 0
                 item['before_rating'] = user.rating
 
-                item['timecost'] = reg.timecost if reg.timecost else 0
+            item['timecost'] = reg.timecost if reg.timecost else 0
 
             return item
 
