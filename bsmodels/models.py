@@ -227,7 +227,7 @@ class Contest(models.Model):
                 'correct': reg.correct_count(),
             }
 
-            if reg.afterrating and reg.beforerating:
+            if reg.afterrating is not None and reg.beforerating is not None:
                 item['changed_rating'] = reg.afterrating - reg.beforerating
                 item['before_rating'] = reg.beforerating
             else:
@@ -254,7 +254,7 @@ class Contest(models.Model):
                 'correct': reg.correct_count(),
             }
 
-            if reg.afterrating and reg.beforerating:
+            if reg.afterrating is not None and reg.beforerating is not None:
                 item['changed_rating'] = reg.afterrating - reg.beforerating
                 item['before_rating'] = reg.beforerating
             else:
