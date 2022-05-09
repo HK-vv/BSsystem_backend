@@ -21,7 +21,7 @@ class BSUser(models.Model):
     rank = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.username
+        return self.openid+": "+self.username
 
     def set_initial_rank(self):
         self.rank = BSUser.objects.filter(rating__gt=0).count() + 1
@@ -44,7 +44,7 @@ class BSAdmin(AbstractUser):
         ordering = ['id']
 
     def __str__(self):
-        return self.username
+        return str(self.id)+": "+self.username
 
 
 class Problem(models.Model):
@@ -60,7 +60,8 @@ class Problem(models.Model):
     public = models.BooleanField()
     authorid = models.ForeignKey(BSAdmin, on_delete=models.SET_NULL, blank=True, null=True)
 
-    # tags = models.ManyToManyField(Tag, through=ProblemTag)
+    def __str__(self):
+        return str(self.id)+": "+self.description[:10]
 
     # 选择题
     def __choice_check(self, answer, ur_answer):
@@ -157,7 +158,7 @@ class Contest(models.Model):
     authorid = models.ForeignKey(BSAdmin, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        return str(self.id)+": "+self.name
 
     def get_end_time(self):
         problems = ContestProblem.objects.filter(contestid=self.id)
@@ -413,7 +414,7 @@ class Tag(models.Model):
     name = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
-        return self.name
+        return str(self.id)+": "+self.name
 
 
 class ProblemTag(models.Model):
