@@ -64,8 +64,12 @@ def contest_list(request, data):
         }
 
         if request.session.get('openid'):
+            item['started'] = False
             if Registration.objects.filter(contestid=contestid, userid_id=request.session.get('openid')).exists():
                 item['registered'] = True
+                reg = Registration.objects.filter(contestid=contestid, userid_id=request.session.get('openid'))[0]
+                if reg.starttime is not None:
+                    item['started'] = True
             else:
                 item['registered'] = False
 

@@ -109,6 +109,13 @@ def contest_history(request, data):
 
         item['status'] = contest.get_status()
 
+        regs = Registration.objects.filter(contestid=contestid, userid=user)
+        item['started'] = False
+        if regs.exists():
+            reg = regs[0]
+            if reg.starttime is not None:
+                item['started'] = True
+
         items.append(item)
 
     return ret_response(0, {'items': items, 'total': total})
