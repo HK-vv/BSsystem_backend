@@ -199,7 +199,7 @@ def result(request, data):
     contestid = data['contestid']
     try:
         contest = Contest.objects.get(id=contestid)
-        if contest.get_status() in ['upcoming', 'running', 'shut']:
+        if contest.get_status() != 'finished':
             return msg_response(1, msg=f'比赛{contestid}未结束')
 
         reg = Registration.objects.get(userid=user, contestid=contest)
