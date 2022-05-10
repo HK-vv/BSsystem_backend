@@ -7,7 +7,7 @@ from django.db import transaction
 from bsmodels.models import Contest, BSUser, Registration, ContestProblem, Problem, Record
 from utils.auxiliary import msg_response, ret_response, get_current_time
 from utils.decorators import require_user_login
-from utils.exceptions import SubmitWrongProblemError, ContestFinishedError
+from utils.exceptions import SubmitWrongProblemError, ContestFinishedError, NotInTimeWindowError
 
 
 @require_user_login
@@ -125,7 +125,6 @@ def contest_history(request, data):
 def start(request, data):
     contestid = data['contestid']
     user = BSUser.objects.get(openid=request.session['openid'])
-    cur = get_current_time()
 
     try:
         contest = Contest.objects.get(id=contestid)
@@ -134,23 +133,27 @@ def start(request, data):
         print(cdne.args)
         return msg_response(1, msg=f'比赛{contestid}不存在')
 
-    if contest.start > cur:
-        return msg_response(1, msg=f'比赛{contestid}未开始')
-
-    elif contest.end < cur or contest.announced:
-        return msg_response(1, msg=f'比赛{contestid}已结束')
-
     try:
         reg = Registration.objects.get(userid=user, contestid=contest)
-        reg.start()
-        reg.update_score()
-        total = ContestProblem.objects.filter(contestid=contest).count()
-        finished = reg.currentnumber > total
-        return ret_response(0, {'total': total, 'finished': finished})
     except Registration.DoesNotExist as rdne:
         traceback.print_exc()
         print(rdne.args)
         return msg_response(1, msg=f'您未注册比赛')
+
+    with transaction.atomic():
+        status = contest.get_status()
+        if status in ['upcoming', 'end', 'finished'] \
+                or status == 'shut' and reg.starttime is None:
+            return msg_response(1)
+        else:
+            try:
+                reg.start()
+                reg.update_score()
+            except NotInTimeWindowError:
+                pass  # nothing happened
+            total = contest.count_problem()
+            finished = reg.currentnumber > total
+            return ret_response(0, {'total': total, 'finished': finished})
 
 
 @require_user_login

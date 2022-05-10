@@ -10,7 +10,7 @@ from django.db.models import Max, Avg, Min
 
 from brainstorm.settings import OUTPUT_LOG, UPDATE_INTERVAL, INITIAL_RATING
 from utils.auxiliary import get_current_time
-from utils.exceptions import SubmitWrongProblemError, ContestFinishedError
+from utils.exceptions import SubmitWrongProblemError, ContestFinishedError, NotInTimeWindowError
 from utils.rating import RatingSystem
 
 
@@ -454,7 +454,7 @@ class Registration(models.Model):
             contest = self.contestid
             cur = get_current_time()
             if not contest.start <= cur <= contest.latest:
-                raise Exception("Not in time window")
+                raise NotInTimeWindowError
             if self.starttime is None:
                 self.starttime = cur
                 self.currenttime = cur
