@@ -174,12 +174,14 @@ class Contest(models.Model):
         cur = pytz.UTC.localize(datetime.datetime.now())
         if cur < self.start:
             return 'upcoming'
-        elif cur < self.end:
+        elif cur < self.latest:
             return 'running'
+        elif cur < self.end:
+            return 'shut'
         elif self.announced:
             return 'finished'
         else:
-            return 'shut'
+            return 'end'
 
     def get_problems(self):
         ps = ContestProblem.objects.filter(contestid=self) \
