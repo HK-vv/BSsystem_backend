@@ -203,6 +203,8 @@ def del_contest(request, data):
         with transaction.atomic():
             for id in contests:
                 contest = Contest.objects.get(id=id)
+                if contest.get_status() != 'upcoming':
+                    return msg_response(1, '只能删除未开始的比赛')
                 if contest.authorid != user and not user.is_superuser:
                     return msg_response(1, f'比赛{id}不是您创建的比赛')
                 contest.delete()
