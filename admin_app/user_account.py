@@ -29,7 +29,7 @@ def user_list(request, data):
     page = Paginator(lst, ps).page(pn)
     items = page.object_list.values('username', 'rating')
     for item in items:
-        item['matched'] = Registration.objects.filter(
+        item['matches'] = Registration.objects.filter(
             userid__username=item['username'], timecost__isnull=False).count()
     items = list(items)
 
