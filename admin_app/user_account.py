@@ -40,7 +40,7 @@ def user_contest_history(request, data):
     username = data['username']
     kw = data.get('keyword')
 
-    lst = Registration.objects.filter(userid__username=username)
+    lst = Registration.objects.filter(userid__username=username, timecost__isnull=False)
     if kw is not None and kw != "":
         lst = lst.filter(contestid__name__icontains=kw)
     tot = lst.count()
