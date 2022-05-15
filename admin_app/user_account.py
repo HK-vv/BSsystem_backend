@@ -27,7 +27,10 @@ def user_list(request, data):
 
     tot = lst.count()
     page = Paginator(lst, ps).page(pn)
-    items = page.object_list.values('username', 'rating', matches=Count('registration'))
+    items = page.object_list.values('username', 'rating')
+    for item in items:
+        item['matched'] = Registration.objects.filter(
+            userid__username=item['username'], timecost__isnull=False).count()
     items = list(items)
 
     return ret_response(0, {'items': items, 'total': tot})
